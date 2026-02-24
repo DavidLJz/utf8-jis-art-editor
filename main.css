@@ -1,0 +1,28 @@
+/* Custom scrollbar for a cleaner look */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #374151;
+}
+
+/* Ensure the editor feels like a sheet of paper or a terminal */
+#editor {
+    resize: none;
+    line-height: 1.2;
+    white-space: pre;
+    overflow: auto;
+    tab-size: 4;
+}
+
+.floating-bar {
+    backdrop-filter: blur(8px);
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTF-8 Art Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style src="./main.css"></style>
+</head>
+<body class="dark bg-neutral-900 transition-colors duration-200 overflow-hidden h-screen flex items-center justify-center">
+
+    <!-- Floating Top Bar -->
+    <header id="floatingBar" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-wrap gap-2 items-center p-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white/80 dark:bg-neutral-800/80 shadow-2xl floating-bar" style="cursor:move;">
+        <!-- File Menu -->
+        <div class="relative group">
+            <button class="px-3 py-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg text-sm font-medium transition-colors text-neutral-800 dark:text-neutral-200">
+                File
+            </button>
+            <div class="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                <button onclick="exportTxt()" class="w-full text-left px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200">Export .txt</button>
+                <button onclick="saveProject()" class="w-full text-left px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200">Save Project (.json)</button>
+                <hr class="border-neutral-200 dark:border-neutral-700">
+                <label class="block w-full text-left px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer text-neutral-800 dark:text-neutral-200">
+                    Load File
+                    <input type="file" id="fileInput" class="hidden" accept=".txt,.json" onchange="loadFile(event)">
+                </label>
+            </div>
+        </div>
+
+        <!-- Font Selector -->
+        <select id="fontSelect" onchange="updateFont()" class="bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 cursor-pointer text-neutral-800 dark:text-neutral-200">
+            <option value="monospace">Default Monospace</option>
+            <option value="'Courier New', Courier, monospace">Courier New</option>
+            <option value="'Lucida Console', Monaco, monospace">Lucida Console</option>
+            <option value="'Consolas', 'Monaco', monospace">Consolas</option>
+            <option value="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace">System Code</option>
+        </select>
+
+        <!-- Font Size -->
+        <input type="number" id="fontSize" value="16" min="8" max="72" onchange="updateFont()" class="w-16 bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 text-neutral-800 dark:text-neutral-200 text-center">
+
+        <!-- Divider -->
+        <div class="h-6 w-px bg-neutral-300 dark:bg-neutral-600 mx-1"></div>
+
+        <!-- Symbol Palette Quick Toggles -->
+        <div class="flex gap-1" id="palette-buttons">
+            <!-- Populated via JS -->
+        </div>
+
+        <!-- Theme Toggle -->
+        <button onclick="toggleTheme()" class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors text-neutral-800 dark:text-neutral-200" title="Toggle Light/Dark Mode">
+            <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"></path></svg>
+            <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+    </header>
+
+    <!-- Main Editor Container -->
+    <main class="w-full h-full flex items-center justify-center p-8">
+        <textarea id="editor" spellcheck="false" placeholder="Start your UTF-8 art here..." 
+            class="w-full max-w-4xl h-full max-h-[80vh] p-8 rounded-lg shadow-inner bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"></textarea>
+    </main>
+
+    <!-- Side Palette for rare symbols -->
+    <div id="symbolPalette" class="fixed right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 p-3 bg-white/80 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl floating-bar max-h-[70vh] overflow-y-auto">
+        <span class="text-[10px] uppercase font-bold text-neutral-400 text-center mb-1">Symbols</span>
+        <!-- Symbols will be injected here -->
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
