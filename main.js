@@ -35,8 +35,10 @@ function makeFloatingBarDraggable() {
 const editor = document.getElementById('editor');
 const fontSelect = document.getElementById('fontSelect');
 const fontSize = document.getElementById('fontSize');
+
 const palette = document.getElementById('symbolPalette');
 const paletteButtons = document.getElementById('palette-buttons');
+const lineHeight = document.getElementById('lineHeight');
 
 const SYMBOLS = [
     '█', '▓', '▒', '░', '▄', '▀', '▌', '▐', '■', '□', 
@@ -87,6 +89,9 @@ function insertAtCursor(text) {
 function updateFont() {
     editor.style.fontFamily = fontSelect.value;
     editor.style.fontSize = fontSize.value + 'px';
+    if (lineHeight) {
+        editor.style.lineHeight = lineHeight.value;
+    }
 }
 
 function toggleTheme() {
@@ -120,6 +125,7 @@ function saveProject() {
         content: editor.value,
         font: fontSelect.value,
         size: fontSize.value,
+        lineHeight: lineHeight ? lineHeight.value : undefined,
         theme: document.body.classList.contains('dark') ? 'dark' : 'light',
         timestamp: new Date().toISOString()
     };
@@ -147,6 +153,7 @@ async function loadFile(event) {
             editor.value = data.content || "";
             if (data.font) fontSelect.value = data.font;
             if (data.size) fontSize.value = data.size;
+            if (data.lineHeight && lineHeight) lineHeight.value = data.lineHeight;
             if (data.theme === 'dark') {
                 document.body.classList.add('dark');
             } else if (data.theme === 'light') {
