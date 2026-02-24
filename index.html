@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UTF-8 Art Editor</title>
+    <!-- Configure Tailwind to use `class` strategy for dark mode so
+         toggling the `dark` class on <body> will affect components. -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        };
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style src="./main.css"></style>
 </head>

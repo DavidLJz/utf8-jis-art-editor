@@ -96,7 +96,16 @@ function updateThemeIcons() {
     const isDark = document.body.classList.contains('dark');
     document.getElementById('sun-icon').classList.toggle('hidden', !isDark);
     document.getElementById('moon-icon').classList.toggle('hidden', isDark);
+
+    // body background color is used for the page outside of Tailwind
     document.body.style.backgroundColor = isDark ? '#171717' : '#f5f5f5';
+
+    // ensure the textarea switches colors even if Tailwind dark mode isn't applied
+    // (this acts as a fallback and keeps inline styles in sync with the class)
+    if (editor) {
+        editor.style.backgroundColor = isDark ? '#1f2937' : '#ffffff';
+        editor.style.color = isDark ? '#f5f5f5' : '#1f2937';
+    }
 }
 
 // File Management

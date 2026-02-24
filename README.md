@@ -1,6 +1,6 @@
 # ToDo
 - [ ] Load tff fonts
-- [ ] Fix theme toggle not working on the text input
+- [x] Fix theme toggle not working on the text input
 - [x] Allow Resizing the text input
 - [ ] Fix textarea width
 - [ ] Export files with current timestamp
