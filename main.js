@@ -49,6 +49,8 @@ const SYMBOLS = [
 const TOP_QUICK_SYMBOLS = ['█', '▓', '▒', '░', '─', '│'];
 
 function init() {
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
     // Build Side Palette
     SYMBOLS.forEach(sym => {
         const btn = document.createElement('button');
