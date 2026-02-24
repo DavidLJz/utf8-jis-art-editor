@@ -5,8 +5,9 @@ function makeFloatingBarDraggable() {
     let startX, startY, startLeft, startTop;
     
     bar.addEventListener('mousedown', function(e) {
-        // Only drag if clicked on header background, not child elements
-        if (e.target !== bar) return;
+        // Allow drag if clicked on bar itself or .grab-area-hint or its children
+        const grabArea = e.target.closest('.grab-area-hint');
+        if (e.target !== bar && !grabArea) return;
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
@@ -63,13 +64,13 @@ function init() {
     });
 
     // Build Top Quick Bar
-    TOP_QUICK_SYMBOLS.forEach(sym => {
-        const btn = document.createElement('button');
-        btn.className = "w-8 h-8 flex items-center justify-center text-sm rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors font-mono";
-        btn.innerText = sym;
-        btn.onclick = () => insertAtCursor(sym);
-        paletteButtons.appendChild(btn);
-    });
+    // TOP_QUICK_SYMBOLS.forEach(sym => {
+    //     const btn = document.createElement('button');
+    //     btn.className = "w-8 h-8 flex items-center justify-center text-sm rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors font-mono";
+    //     btn.innerText = sym;
+    //     btn.onclick = () => insertAtCursor(sym);
+    //     paletteButtons.appendChild(btn);
+    // });
 
     // Set initial state
     updateFont();

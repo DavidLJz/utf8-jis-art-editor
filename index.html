@@ -27,6 +27,18 @@
 
     <!-- Floating Top Bar -->
     <header id="floatingBar" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-wrap gap-2 items-center p-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white/80 dark:bg-neutral-800/80 shadow-2xl floating-bar" style="cursor:move;">
+        <!-- Grab Area with Visual Cue -->
+        <div class="grab-area-hint flex items-center justify-center px-2 cursor-grab active:cursor-grabbing text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <circle cx="9" cy="6" r="1.5"/>
+            <circle cx="9" cy="12" r="1.5"/>
+            <circle cx="9" cy="18" r="1.5"/>
+            <circle cx="15" cy="6" r="1.5"/>
+            <circle cx="15" cy="12" r="1.5"/>
+            <circle cx="15" cy="18" r="1.5"/>
+            </svg>
+        </div>
+
         <!-- File Menu -->
         <div class="relative group">
             <button class="px-3 py-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg text-sm font-medium transition-colors text-neutral-800 dark:text-neutral-200">
