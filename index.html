@@ -6,12 +6,14 @@
     <title>UTF-8 Art Editor</title>
     <!-- Configure Tailwind to use `class` strategy for dark mode so
          toggling the `dark` class on <body> will affect components. -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
         };
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- custom fonts -->
+    <link rel="preload" href="./resources/fonts/mona-subset.woff2?v=0.0.1" as="font" type="font/woff2">
     <style src="./main.css"></style>
 </head>
 <body class="dark bg-neutral-900 transition-colors duration-200 overflow-hidden h-screen flex items-center justify-center">
@@ -44,6 +46,8 @@
         <!-- Font Selector -->
         <select id="fontSelect" onchange="updateFont()" class="bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 cursor-pointer text-neutral-800 dark:text-neutral-200">
             <option value="monospace">Default Monospace</option>
+            <option value="MonaSubset">Mona Subset</option>
+            <option value="'MS PGothic'">MS PGothic</option>
             <option value="'Courier New', Courier, monospace">Courier New</option>
             <option value="'Lucida Console', Monaco, monospace">Lucida Console</option>
             <option value="'Consolas', 'Monaco', monospace">Consolas</option>

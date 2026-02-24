@@ -26,3 +26,9 @@
 .floating-bar {
     backdrop-filter: blur(8px);
 }
+
+@font-face {
+  font-family: 'MonaSubset';
+  src: url('./resources/fonts/mona-subset.woff2') format('woff2');
+  font-display: swap;
+}
