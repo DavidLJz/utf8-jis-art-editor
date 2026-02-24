@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About — UTF-8 Art Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+    <header class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <h1 class="text-xl font-bold tracking-tight">UTF-8 Art Editor</h1>
+        <nav>
+            <a href="index.html" class="text-blue-600 dark:text-blue-400 hover:underline mr-4">Editor</a>
+            <a href="about.html" class="text-gray-500 dark:text-gray-400 underline cursor-default">About</a>
+        </nav>
+    </header>
+    <main class="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        <div class="max-w-xl w-full">
+            <h2 class="text-2xl font-semibold mb-4">About</h2>
+            <p class="mb-4">
+                <strong>UTF-8 Art Editor</strong> is a minimal, standalone web app for crafting blocky or UTF‑8 art in your browser. No installation, no backend, no build tools—just open <code>index.html</code> and start creating.
+            </p>
+            <ul class="list-disc pl-6 mb-4 space-y-1">
+                <li>Draw with any Unicode symbols in a textarea</li>
+                <li>Export/import your art as JSON files</li>
+                <li>Change fonts, font size, and color themes</li>
+                <li>Customizable symbol palette</li>
+                <li>Mobile and desktop friendly</li>
+            </ul>
+            <p class="mb-4">
+                Built with vanilla JavaScript and styled using <a href="https://tailwindcss.com/" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener">Tailwind CSS</a> via CDN.
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                &copy; 2024 UTF-8 Art Editor. MIT License.
+            </p>
+        </div>
+    </main>
+</body>
+</html>

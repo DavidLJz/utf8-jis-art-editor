@@ -15,6 +15,13 @@
     <style src="./main.css"></style>
 </head>
 <body class="dark bg-neutral-900 transition-colors duration-200 overflow-hidden h-screen flex items-center justify-center">
+    <header class="fixed top-0 left-0 w-full z-40 flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <h1 class="text-xl font-bold tracking-tight text-white">UTF-8 Art Editor</h1>
+        <nav>
+            <a href="index.html" class="text-blue-600 dark:text-blue-400 hover:underline mr-4">Editor</a>
+            <a href="about.html" class="text-gray-500 dark:text-gray-400 underline cursor-default">About</a>
+        </nav>
+    </header>
 
     <!-- Floating Top Bar -->
     <header id="floatingBar" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-wrap gap-2 items-center p-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white/80 dark:bg-neutral-800/80 shadow-2xl floating-bar" style="cursor:move;">
@@ -62,7 +69,7 @@
     </header>
 
     <!-- Main Editor Container -->
-    <main class="w-full h-full flex items-center justify-center p-8">
+    <main class="w-full h-full flex items-center justify-center p-8 pt-20">
         <textarea id="editor" spellcheck="false" placeholder="Start your UTF-8 art here..." 
             class="w-full max-w-[80vw] h-full max-h-[80vh] p-8 rounded-lg shadow-inner bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize"></textarea>
     </main>
