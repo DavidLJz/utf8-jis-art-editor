@@ -45,7 +45,7 @@
         </div>
 
         <!-- Font Selector -->
-        <select id="fontSelect" onchange="updateFont()" class="bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 cursor-pointer text-neutral-800 dark:text-neutral-200">
+        <select id="fontSelect" onchange="updateFont()" class="bg-white dark:bg-neutral-700 border-none text-sm px-2 py-1.5 focus:ring-0 cursor-pointer text-neutral-800 dark:text-neutral-200">
             <option value="monospace">Default Monospace</option>
             <!-- <option value="MonaSubset">Mona Subset</option> -->
             <option value="'MS PGothic'">MS PGothic</option>
@@ -59,14 +59,14 @@
 
         <!-- Font Size -->
         <div class="flex items-center space-x-1">
-            <label for="fontSize" class="text-xs text-neutral-800 dark:text-neutral-200">Size</label>
-            <input type="number" id="fontSize" value="16" min="8" max="72" onchange="updateFont()" class="w-10 bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 text-neutral-800 dark:text-neutral-200 text-center [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" title="Font Size" style="-moz-appearance: textfield;">
+            <label for="fontSize" class="text-xs font-bold text-neutral-800 dark:text-neutral-200">Size</label>
+            <input type="number" id="fontSize" value="16" min="8" max="72" onchange="updateFont()" class="w-10 bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 text-neutral-800 dark:text-neutral-200 text-center [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" title="Font Size" style="-moz-appearance: textfield; appearance: textfield;">
         </div>
 
         <!-- Line Height -->
         <div class="flex items-center space-x-1">
-            <label for="lineHeight" class="text-xs text-neutral-800 dark:text-neutral-200">Line H</label>
-            <input type="number" id="lineHeight" value="1" min="0.5" max="3" step="0.05" onchange="updateFont()" class="w-10 bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 text-neutral-800 dark:text-neutral-200 text-center [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" title="Line Height" style="-moz-appearance: textfield;">
+            <label for="lineHeight" class="text-xs font-bold text-neutral-800 dark:text-neutral-200">Line H</label>
+            <input type="number" id="lineHeight" value="1" min="0.5" max="3" step="0.05" onchange="updateFont()" class="w-10 bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 text-neutral-800 dark:text-neutral-200 text-center [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" title="Line Height" style="-moz-appearance: textfield; appearance: textfield;">
         </div>
 
         <!-- Divider -->
