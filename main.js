@@ -141,6 +141,53 @@ function downloadFile(content, fileName, contentType) {
     URL.revokeObjectURL(a.href);
 }
 
+// create a PNG snapshot of the textarea content using current font settings
+function exportImage() {
+    const text = editor.value || "";
+    const lines = text.split("\n");
+    const size = parseInt(fontSize.value, 10) || 16;
+    const lh = lineHeight ? parseFloat(lineHeight.value) : 1;
+    const font = fontSelect.value;
+
+    // temporary canvas for measurement
+    const measureCanvas = document.createElement('canvas');
+    const mctx = measureCanvas.getContext('2d');
+    mctx.font = size + 'px ' + font;
+
+    let maxWidth = 0;
+    lines.forEach(line => {
+        const w = mctx.measureText(line).width;
+        if (w > maxWidth) maxWidth = w;
+    });
+
+    const lineHeightPx = size * lh;
+    const padding = 10;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(maxWidth) + padding * 2;
+    canvas.height = Math.ceil(lineHeightPx * lines.length) + padding * 2;
+    const ctx = canvas.getContext('2d');
+
+    // background based on theme
+    const bgColor = document.body.classList.contains('dark') ? '#1f2937' : '#ffffff';
+    const fgColor = document.body.classList.contains('dark') ? '#f5f5f5' : '#1f2937';
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = fgColor;
+    ctx.font = size + 'px ' + font;
+    ctx.textBaseline = 'top';
+
+    lines.forEach((line, i) => {
+        ctx.fillText(line, padding, padding + i * lineHeightPx);
+    });
+
+    const dataUrl = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'artwork.png';
+    a.click();
+}
+
 async function loadFile(event) {
     const file = event.target.files[0];
     if (!file) return;

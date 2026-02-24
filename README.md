@@ -7,3 +7,5 @@
 - [ ] Allow naming file
 - [ ] Add custom character palette
 - [ ] Add custom themes
+- [x] Add "Export as Image" option
+- [ ] Add "Hide UI" mode for screenshots
