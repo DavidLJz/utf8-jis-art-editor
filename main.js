@@ -95,6 +95,25 @@ const TOP_QUICK_SYMBOLS = ['█', '▓', '▒', '░', '─', '│'];
 function init() {
     document.getElementById('footer-year').textContent = new Date().getFullYear();
 
+    // give the editor initial value from localStorage if present
+    const saved = localStorage.getItem('utf8JisArtProject');
+    if (saved) {
+        try {
+            const project = Project.fromObject(JSON.parse(saved));
+            editor.value = project.content;
+            fontSelect.value = project.font;
+            fontSize.value = project.size;
+            if (project.lineHeight && lineHeight) lineHeight.value = project.lineHeight;
+            if (project.theme === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+        } catch (e) {
+            console.warn('failed to parse autosaved project', e);
+        }
+    }
+
     // Build Side Palette
     SYMBOLS.forEach(sym => {
         const btn = document.createElement('button');
@@ -161,6 +180,50 @@ function updateThemeIcons() {
 function exportTxt() {
     downloadFile(editor.value, 'artwork.txt', 'text/plain');
 }
+
+// auto save support
+let autoSaveTimer = null;
+
+function scheduleAutoSave() {
+    // clear previous timer and set a new one for 5 seconds later
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+        const project = new Project(
+            editor.value,
+            fontSelect.value,
+            fontSize.value,
+            lineHeight ? lineHeight.value : undefined,
+            document.body.classList.contains('dark') ? 'dark' : 'light',
+            new Date().toISOString()
+        );
+        try {
+            localStorage.setItem('utf8JisArtProject', project.toJson());
+        } catch (e) {
+            console.warn('auto-save failed', e);
+        }
+        autoSaveTimer = null;
+    }, 5000);
+}
+
+// attach listeners that should trigger auto save
+if (editor) {
+    editor.addEventListener('input', scheduleAutoSave);
+}
+if (fontSelect) {
+    fontSelect.addEventListener('change', scheduleAutoSave);
+}
+if (fontSize) {
+    fontSize.addEventListener('change', scheduleAutoSave);
+}
+if (lineHeight) {
+    lineHeight.addEventListener('change', scheduleAutoSave);
+}
+// ensure theme toggle triggers an autosave after theme switch
+function scheduleAutoSaveWithTheme() {
+    toggleTheme();
+    scheduleAutoSave();
+}
+
 
 function saveProject() {
     const project = new Project(
