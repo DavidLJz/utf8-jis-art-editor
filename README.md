@@ -1,5 +1,6 @@
 # ToDo
 - [ ] Load tff fonts
+- [ ] Autosave contents and config to local storage
 - [x] Fix theme toggle not working on the text input
 - [x] Allow Resizing the text input
 - [x] Fix textarea width

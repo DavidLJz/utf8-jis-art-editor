@@ -1,4 +1,45 @@
 // Make floating bar draggable
+
+// project data wrapper
+class Project {
+    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "") {
+        this.content = content;
+        this.font = font;
+        this.size = size;
+        this.lineHeight = lineHeight;
+        this.theme = theme;
+        this.timestamp = timestamp;
+    }
+
+    toJSON() {
+        // called by JSON.stringify automatically
+        return {
+            content: this.content,
+            font: this.font,
+            size: this.size,
+            lineHeight: this.lineHeight,
+            theme: this.theme,
+            timestamp: this.timestamp
+        };
+    }
+
+    static fromObject(obj) {
+        if (!obj) return new Project();
+        return new Project(
+            obj.content || "",
+            obj.font || "",
+            obj.size || "",
+            obj.lineHeight,
+            obj.theme || "light",
+            obj.timestamp || ""
+        );
+    }
+
+    toJson() {
+        return JSON.stringify(this, null, 2);
+    }
+}
+
 function makeFloatingBarDraggable() {
     const bar = document.getElementById('floatingBar');
     let isDragging = false;
@@ -122,15 +163,15 @@ function exportTxt() {
 }
 
 function saveProject() {
-    const project = {
-        content: editor.value,
-        font: fontSelect.value,
-        size: fontSize.value,
-        lineHeight: lineHeight ? lineHeight.value : undefined,
-        theme: document.body.classList.contains('dark') ? 'dark' : 'light',
-        timestamp: new Date().toISOString()
-    };
-    downloadFile(JSON.stringify(project, null, 2), 'art_project.json', 'application/json');
+    const project = new Project(
+        editor.value,
+        fontSelect.value,
+        fontSize.value,
+        lineHeight ? lineHeight.value : undefined,
+        document.body.classList.contains('dark') ? 'dark' : 'light',
+        new Date().toISOString()
+    );
+    downloadFile(project.toJson(), 'art_project.json', 'application/json');
 }
 
 function downloadFile(content, fileName, contentType) {
@@ -198,13 +239,14 @@ async function loadFile(event) {
     if (file.name.endsWith('.json')) {
         try {
             const data = JSON.parse(text);
-            editor.value = data.content || "";
-            if (data.font) fontSelect.value = data.font;
-            if (data.size) fontSize.value = data.size;
-            if (data.lineHeight && lineHeight) lineHeight.value = data.lineHeight;
-            if (data.theme === 'dark') {
+            const project = Project.fromObject(data);
+            editor.value = project.content;
+            fontSelect.value = project.font;
+            fontSize.value = project.size;
+            if (project.lineHeight && lineHeight) lineHeight.value = project.lineHeight;
+            if (project.theme === 'dark') {
                 document.body.classList.add('dark');
-            } else if (data.theme === 'light') {
+            } else if (project.theme === 'light') {
                 document.body.classList.remove('dark');
             }
             updateFont();
