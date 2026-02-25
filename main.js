@@ -273,8 +273,8 @@ function exportImage() {
     const ctx = canvas.getContext('2d');
 
     // background based on theme
-    const bgColor = document.body.classList.contains('dark') ? '#1f2937' : '#ffffff';
-    const fgColor = document.body.classList.contains('dark') ? '#f5f5f5' : '#1f2937';
+    const bgColor = document.body.classList.contains('dark') ? '#000000' : '#ffffff';
+    const fgColor = document.body.classList.contains('dark') ? '#f5f5f5' : '#000000';
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
