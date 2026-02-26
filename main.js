@@ -194,6 +194,19 @@ const toggleSavingIndicator = (show) => {
     }
 };
 
+const displayFailedAutoSave = () => {
+    if (!indicator) return;
+    const textEl = indicator.querySelector('.text-sm');
+
+    indicator.classList.add('bg-red-100', 'text-red-800', 'border-red-300');
+    textEl.textContent = 'Failed!';
+
+    setTimeout(() => { 
+        indicator.classList.remove('bg-red-100', 'text-red-800', 'border-red-300');
+        textEl.textContent = 'Saving...';
+    }, 1100);
+}
+
 // auto save support
 let autoSaveTimer = null;
 
@@ -202,21 +215,22 @@ function scheduleAutoSave() {
     if (autoSaveTimer) clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(() => {
         toggleSavingIndicator(true);
-        const project = new Project(
-            editor.value,
-            fontSelect.value,
-            fontSize.value,
-            lineHeight ? lineHeight.value : undefined,
-            document.body.classList.contains('dark') ? 'dark' : 'light',
-            new Date().toISOString()
-        );
         try {
+            const project = new Project(
+                editor.value,
+                fontSelect.value,
+                fontSize.value,
+                lineHeight ? lineHeight.value : undefined,
+                document.body.classList.contains('dark') ? 'dark' : 'light',
+                new Date().toISOString()
+            );
             localStorage.setItem('utf8JisArtProject', project.toJson());
         } catch (e) {
             console.warn('auto-save failed', e);
+            displayFailedAutoSave();
         }
         autoSaveTimer = null;
-    
+
         setTimeout(() => toggleSavingIndicator(false), 1000);
     
     }, 5000);
