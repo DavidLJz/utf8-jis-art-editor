@@ -181,6 +181,19 @@ function exportTxt() {
     downloadFile(editor.value, 'artwork.txt', 'text/plain');
 }
 
+const indicator = document.getElementById('savingIndicator');
+
+const toggleSavingIndicator = (show) => {
+    if (!indicator) return;
+    if (show) {
+        indicator.classList.remove('opacity-0', 'pointer-events-none');
+        indicator.classList.add('opacity-100');
+    } else {
+        indicator.classList.remove('opacity-100');
+        indicator.classList.add('opacity-0', 'pointer-events-none');
+    }
+};
+
 // auto save support
 let autoSaveTimer = null;
 
@@ -188,6 +201,7 @@ function scheduleAutoSave() {
     // clear previous timer and set a new one for 5 seconds later
     if (autoSaveTimer) clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(() => {
+        toggleSavingIndicator(true);
         const project = new Project(
             editor.value,
             fontSelect.value,
@@ -202,6 +216,9 @@ function scheduleAutoSave() {
             console.warn('auto-save failed', e);
         }
         autoSaveTimer = null;
+    
+        setTimeout(() => toggleSavingIndicator(false), 1000);
+    
     }, 5000);
 }
 

@@ -1,6 +1,7 @@
 # ToDo
-- [ ] Load tff fonts
+- [ ] Show a saving indicator when saving to local storage
 - [ ] Autosave contents and config to local storage
+- [ ] Read only mode
 - [x] Fix theme toggle not working on the text input
 - [x] Allow Resizing the text input
 - [x] Fix textarea width
@@ -9,4 +10,3 @@
 - [ ] Add custom character palette
 - [ ] Add custom themes
 - [x] Add "Export as Image" option
-- [ ] Add "Hide UI" mode for screenshots
