@@ -2,42 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>About — UTF-8 Art Editor</title>
+    <title data-i18n="title">About — UTF-8 Art Editor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="locale.js"></script>
     <link rel="stylesheet" href="main.css">
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
     <header class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <h1 class="text-xl font-bold tracking-tight">UTF-8 Art Editor</h1>
+        <h1 class="text-xl font-bold tracking-tight" data-i18n="headerTitle">UTF-8 Art Editor</h1>
         <nav>
-            <a href="index.html" class="text-blue-600 dark:text-blue-400 hover:underline mr-4">Editor</a>
-            <a href="about.html" class="text-gray-500 dark:text-gray-400 underline cursor-default">About</a>
+            <a href="index.html" class="text-blue-600 dark:text-blue-400 hover:underline mr-4" data-i18n="navEditor">Editor</a>
+            <a href="about.html" class="text-gray-500 dark:text-gray-400 underline cursor-default" data-i18n="navAbout">About</a>
         </nav>
     </header>
     <main class="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <div class="max-w-xl w-full">
             <section class="mb-8">
-                <h2 class="text-2xl font-semibold mb-4">About</h2>
-                <p class="mb-4">
+                <h2 class="text-2xl font-semibold mb-4" data-i18n="aboutHeading">About</h2>
+                <p class="mb-4" data-i18n="aboutPara1" data-i18n-html>
                     <strong>UTF-8 Art Editor</strong> is a minimal, standalone web app for crafting blocky or UTF‑8 art in your browser. No installation, no backend, no build tools—just open <code>index.html</code> and start creating.
                 </p>
                 <ul class="list-disc pl-6 mb-4 space-y-1">
-                    <li>Draw with any Unicode symbols in a textarea</li>
-                    <li>Export/import your art as JSON files</li>
-                    <li>Change fonts, font size, and color themes</li>
-                    <li>Customizable symbol palette</li>
-                    <li>Mobile and desktop friendly</li>
+                    <li data-i18n="feature1">Draw with any Unicode symbols in a textarea</li>
+                    <li data-i18n="feature2">Export/import your art as JSON files</li>
+                    <li data-i18n="feature3">Change fonts, font size, and color themes</li>
+                    <li data-i18n="feature4">Customizable symbol palette</li>
+                    <li data-i18n="feature5">Mobile and desktop friendly</li>
                 </ul>
-                <p class="mb-4">
+                <p class="mb-4" data-i18n="builtWith" data-i18n-html>
                     Built with vanilla JavaScript and styled using <a href="https://tailwindcss.com/" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener">Tailwind CSS</a> via CDN.
                 </p>
             </section>
 
             <section class="mb-8">
-                <h2 class="text-2xl font-semibold mb-2">Explore More Art</h2>
-                <p>
+                <h2 class="text-2xl font-semibold mb-2" data-i18n="exploreHeading">Explore More Art</h2>
+                <p data-i18n="explorePara" data-i18n-html>
                     You can find some examples of UTF-8 art <a href="http://anime.en.utf8art.com/tag/patchouli-knowledge" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener">in this link.</a>
                 </p>
             </section>
@@ -68,7 +69,7 @@
                 <img src="https://img.shields.io/badge/license-IPA%20Font%20License%20Agreement%20v1.0-blue" alt="IPA Font License Agreement v1.0" class="inline-block mb-4">
             </a> -->
 
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="text-sm text-gray-500 dark:text-gray-400" data-i18n-html="footerCopy">
                 &copy; 2024 UTF-8 Art Editor. MIT License.
             </p>
         </div>

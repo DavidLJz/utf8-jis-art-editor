@@ -92,32 +92,6 @@ const SYMBOLS = [
 
 const TOP_QUICK_SYMBOLS = ['█', '▓', '▒', '░', '─', '│'];
 
-class LocaleHelper {
-    static EN = {
-        deviceAlert: "This site is optimized for desktop. Your current screen size may affect the experience."
-    };
-
-    static ES = {
-        deviceAlert: "Este sitio está optimizado para escritorio. El tamaño de pantalla actual puede afectar la experiencia."
-    };
-
-    constructor () {
-        if (navigator.language.startsWith('es')) {
-            this.lang = LocaleHelper.EN
-        } else {
-            this.lang = LocaleHelper.ES
-        }
-    }
-
-    msg(k) {
-        if (k in this.lang) {
-            return this.lang[k]
-        }
-
-        throw new Error('value for ' + k + ' not found in lang: ' + navigator.language)
-    }
-};
-
 function init() {
     const locale = new LocaleHelper()
 
