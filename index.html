@@ -165,12 +165,17 @@
     </div>
 
     <!-- Main Editor Container -->
-    <main class="w-full h-full flex items-center justify-center p-8 pt-20 relative overflow-hidden">
-        <!-- Background Layer -->
-        <div id="editorBgLayer" class="absolute inset-0 z-0 pointer-events-none bg-no-repeat transition-all"></div>
-        
-        <textarea id="editor" spellcheck="false" placeholder="Start your UTF-8 art here..." 
-            class="w-full max-w-[80vw] h-full max-h-[80vh] p-8 rounded-lg shadow-inner bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize relative z-10"></textarea>
+    <main class="w-full h-full flex items-center justify-center p-8 pt-20">
+        <!-- Visual Wrapper (Artificial Padding) -->
+        <div id="editorVisualContainer" class="w-full max-w-[80vw] h-full max-h-[80vh] bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 p-6 overflow-hidden flex flex-col transition-colors duration-300">
+            <div class="w-full h-full relative">
+                <!-- Background Layer -->
+                <div id="editorBgLayer" class="absolute inset-0 z-0 pointer-events-none bg-no-repeat rounded-lg opacity-0" style="padding: 0; background-origin: padding-box;"></div>
+                
+                <textarea id="editor" spellcheck="false" placeholder="Start your UTF-8 art here..." 
+                    class="w-full h-full p-0 bg-transparent text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-0 transition-all resize-none relative z-10"></textarea>
+            </div>
+        </div>
     </main>
 
     <!-- Side Palette for rare symbols -->

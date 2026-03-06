@@ -24,6 +24,17 @@
     background-repeat: no-repeat !important;
     background-origin: padding-box;
     background-attachment: local;
+    outline: none !important;
+}
+
+#editor:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+#editor::selection {
+    background: rgba(59, 130, 246, 0.2); /* Light blue tint that doesn't block the trace image */
+    color: inherit;
 }
 
 .floating-bar {
@@ -36,6 +47,12 @@
 
 #bgModal:not(.hidden) {
     display: flex;
+}
+
+#editorBgLayer {
+    transition: none !important; /* Prevent drifting during resize */
+    background-origin: content-box; /* Match textarea text area */
+    pointer-events: none;
 }
 
 @font-face {

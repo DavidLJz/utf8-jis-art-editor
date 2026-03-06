@@ -168,17 +168,24 @@ function init() {
     makeFloatingBarDraggable();
     
     // Ensure the background layer matches the editor on resize
-    window.addEventListener('resize', () => {
-        if (currentBgImage) {
-            applyBgSettingsToEditor({
-                image: currentBgImage,
-                opacity: parseFloat(bgOpacity.value),
-                scale: parseInt(bgScale.value),
-                posX: parseInt(bgPosX.value),
-                posY: parseInt(bgPosY.value)
-            });
-        }
-    });
+    if (window.ResizeObserver && editor && bgLayer) {
+        const ro = new ResizeObserver(() => {
+            if (currentBgImage) {
+                syncBgLayerSync();
+            }
+        });
+        ro.observe(editor);
+    }
+}
+
+function syncBgLayerSync() {
+    if (!bgLayer || !editor) return;
+    
+    // Both are now contained in a relative parent with 100% size
+    // We just ensure the bgLayer dimensions match the textarea's current bounding box
+    const rect = editor.getBoundingClientRect();
+    bgLayer.style.width = rect.width + 'px';
+    bgLayer.style.height = rect.height + 'px';
 }
 
 function insertAtCursor(text) {
@@ -208,34 +215,42 @@ function updateThemeIcons() {
     const isDark = document.body.classList.contains('dark');
     const sunIcon = document.getElementById('sun-icon');
     const moonIcon = document.getElementById('moon-icon');
+    const visualContainer = document.getElementById('editorVisualContainer');
     
     if (sunIcon) sunIcon.classList.toggle('hidden', !isDark);
     if (moonIcon) moonIcon.classList.toggle('hidden', isDark);
 
+    // Update the visual container colors
+    if (visualContainer) {
+        visualContainer.style.backgroundColor = isDark ? '#1f2937' : '#ffffff';
+        visualContainer.style.borderColor = isDark ? '#374151' : '#e5e7eb';
+        
+        // If we have a background image, we can optionally make the container background 
+        // a semi-transparent version of its current color to let the image show through
+        // but now the image is *inside* the container, so we just want the container
+        // to have the right background. The alpha logic below is for the OVERLAY
+        // which we now apply to the editor textarea if needed.
+    }
+
     // body background color is used for the page outside of Tailwind
     document.body.style.backgroundColor = isDark ? '#171717' : '#f5f5f5';
 
-    // ensure the textarea switches colors even if Tailwind dark mode isn't applied
-    // (this acts as a fallback and keeps inline styles in sync with the class)
+    // ensure the textarea remains transparent and shifts text color
     if (editor) {
-        // if we have a background image, we can optionally make the editor background 
-        // a semi-transparent version of its current color to let the image show through
+        editor.style.backgroundColor = 'transparent';
+        editor.style.color = isDark ? '#f5f5f5' : '#1f2937';
+
+        // Apply an overlay transparency to the TEXTAREA itself to act as 
+        // the "contrast blocker" for the background image underneath.
         if (currentBgImage) {
-            // Slider 1.0 (Full Image Visibility) -> Alpha 0 (Overlay is Transparent)
-            // Slider 0.0 (No Image Visibility) -> Alpha 1 (Overlay is Solid)
             const opacity = parseFloat(bgOpacity.value);
             const r = isDark ? 31 : 255;
             const g = isDark ? 41 : 255;
             const b = isDark ? 55 : 255;
-            // The overlay alpha is inversely proportional to desired image visibility
-            // We use a lighter alpha if we have a dedicated layer for better contrast
-            const bgAlpha = bgLayer ? 0.75 : (1 - opacity);
+            // The overlay alpha on the textarea helps with text readability
+            const bgAlpha = 0.75; 
             editor.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${bgAlpha})`;
-        } else {
-            const color = isDark ? '#1f2937' : '#ffffff';
-            editor.style.backgroundColor = color;
         }
-        editor.style.color = isDark ? '#f5f5f5' : '#1f2937';
     }
 }
 
@@ -376,17 +391,19 @@ function applyBgSettingsToEditor(settings) {
     if (bgLayer) {
         bgLayer.style.backgroundImage = `url(${settings.image})`;
         bgLayer.style.backgroundRepeat = 'no-repeat';
-        bgLayer.style.backgroundSize = `${settings.scale}%`;
+        
+        // Use fixed pixel sizing for the background to prevent it Resizing when the window/textarea resizes.
+        // We use a reference width (e.g., 1000px) as the 100% scale basis.
+        const baseWidth = 1000; 
+        const pixelWidth = (baseWidth * settings.scale) / 100;
+        bgLayer.style.backgroundSize = `${pixelWidth}px auto`;
+        
         bgLayer.style.backgroundPosition = `${settings.posX}% ${settings.posY}%`;
+        bgLayer.style.backgroundOrigin = 'padding-box';
         bgLayer.style.opacity = settings.opacity;
         
-        // Match the textarea dimensions/position
-        const rect = editor.getBoundingClientRect();
-        bgLayer.style.position = 'fixed';
-        bgLayer.style.left = rect.left + 'px';
-        bgLayer.style.top = rect.top + 'px';
-        bgLayer.style.width = rect.width + 'px';
-        bgLayer.style.height = rect.height + 'px';
+        // Match the textarea dimensions/position relative to its container
+        syncBgLayerSync();
     } else {
         // Fallback for safety
         editor.style.backgroundImage = `url(${settings.image})`;
