@@ -130,13 +130,16 @@ function init() {
             fontSelect.value = project.font;
             fontSize.value = project.size;
             if (project.lineHeight && lineHeight) lineHeight.value = project.lineHeight;
-            if (project.bgSettings) {
-                applyBgSettingsFromData(project.bgSettings);
-            }
+            
             if (project.theme === 'dark') {
                 document.body.classList.add('dark');
             } else {
                 document.body.classList.remove('dark');
+            }
+
+            // Ensure background settings are applied if they exist in the project data
+            if (project.bgSettings) {
+                applyBgSettingsFromData(project.bgSettings);
             }
         } catch (e) {
             console.warn('failed to parse autosaved project', e);
@@ -424,10 +427,10 @@ function applyBgSettingsFromData(settings) {
     if (!settings) return;
     
     currentBgImage = settings.image;
-    bgOpacity.value = settings.opacity || 0.5;
+    bgOpacity.value = settings.opacity !== undefined ? settings.opacity : 0.5;
     bgScale.value = settings.scale || 100;
-    bgPosX.value = settings.posX || 50;
-    bgPosY.value = settings.posY || 50;
+    bgPosX.value = settings.posX !== undefined ? settings.posX : 50;
+    bgPosY.value = settings.posY !== undefined ? settings.posY : 50;
 
     if (currentBgImage) {
         bgPreview.style.backgroundImage = `url(${currentBgImage})`;
