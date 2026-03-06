@@ -21,10 +21,21 @@
     white-space: pre;
     overflow: auto;
     tab-size: 4;
+    background-repeat: no-repeat !important;
+    background-origin: padding-box;
+    background-attachment: local;
 }
 
 .floating-bar {
     backdrop-filter: blur(8px);
+}
+
+#bgModal[style*="display: none"] {
+    display: none !important;
+}
+
+#bgModal:not(.hidden) {
+    display: flex;
 }
 
 @font-face {

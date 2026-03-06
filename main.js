@@ -2,13 +2,14 @@
 
 // project data wrapper
 class Project {
-    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "") {
+    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null) {
         this.content = content;
         this.font = font;
         this.size = size;
         this.lineHeight = lineHeight;
         this.theme = theme;
         this.timestamp = timestamp;
+        this.bgSettings = bgSettings;
     }
 
     toJSON() {
@@ -19,7 +20,8 @@ class Project {
             size: this.size,
             lineHeight: this.lineHeight,
             theme: this.theme,
-            timestamp: this.timestamp
+            timestamp: this.timestamp,
+            bgSettings: this.bgSettings
         };
     }
 
@@ -31,7 +33,8 @@ class Project {
             obj.size || "",
             obj.lineHeight,
             obj.theme || "light",
-            obj.timestamp || ""
+            obj.timestamp || "",
+            obj.bgSettings || null
         );
     }
 
@@ -82,6 +85,17 @@ const palette = document.getElementById('symbolPalette');
 const paletteButtons = document.getElementById('palette-buttons');
 const lineHeight = document.getElementById('lineHeight');
 
+// Background parameters
+const bgModal = document.getElementById('bgModal');
+const bgPreview = document.getElementById('bgPreview');
+const bgPreviewPlaceholder = document.getElementById('bgPreviewPlaceholder');
+const bgInput = document.getElementById('bgInput');
+const bgOpacity = document.getElementById('bgOpacity');
+const bgScale = document.getElementById('bgScale');
+const bgPosX = document.getElementById('bgPosX');
+const bgPosY = document.getElementById('bgPosY');
+const bgLayer = document.getElementById('editorBgLayer');
+
 const SYMBOLS = [
     '█', '▓', '▒', '░', '▄', '▀', '▌', '▐', '■', '□', 
     '─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼',
@@ -114,6 +128,9 @@ function init() {
             fontSelect.value = project.font;
             fontSize.value = project.size;
             if (project.lineHeight && lineHeight) lineHeight.value = project.lineHeight;
+            if (project.bgSettings) {
+                applyBgSettingsFromData(project.bgSettings);
+            }
             if (project.theme === 'dark') {
                 document.body.classList.add('dark');
             } else {
@@ -146,6 +163,19 @@ function init() {
     updateFont();
     updateThemeIcons();
     makeFloatingBarDraggable();
+    
+    // Ensure the background layer matches the editor on resize
+    window.addEventListener('resize', () => {
+        if (currentBgImage) {
+            applyBgSettingsToEditor({
+                image: currentBgImage,
+                opacity: parseFloat(bgOpacity.value),
+                scale: parseInt(bgScale.value),
+                posX: parseInt(bgPosX.value),
+                posY: parseInt(bgPosY.value)
+            });
+        }
+    });
 }
 
 function insertAtCursor(text) {
@@ -172,8 +202,11 @@ function toggleTheme() {
 
 function updateThemeIcons() {
     const isDark = document.body.classList.contains('dark');
-    document.getElementById('sun-icon').classList.toggle('hidden', !isDark);
-    document.getElementById('moon-icon').classList.toggle('hidden', isDark);
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    
+    if (sunIcon) sunIcon.classList.toggle('hidden', !isDark);
+    if (moonIcon) moonIcon.classList.toggle('hidden', isDark);
 
     // body background color is used for the page outside of Tailwind
     document.body.style.backgroundColor = isDark ? '#171717' : '#f5f5f5';
@@ -181,7 +214,23 @@ function updateThemeIcons() {
     // ensure the textarea switches colors even if Tailwind dark mode isn't applied
     // (this acts as a fallback and keeps inline styles in sync with the class)
     if (editor) {
-        editor.style.backgroundColor = isDark ? '#1f2937' : '#ffffff';
+        // if we have a background image, we can optionally make the editor background 
+        // a semi-transparent version of its current color to let the image show through
+        if (currentBgImage) {
+            // Slider 1.0 (Full Image Visibility) -> Alpha 0 (Overlay is Transparent)
+            // Slider 0.0 (No Image Visibility) -> Alpha 1 (Overlay is Solid)
+            const opacity = parseFloat(bgOpacity.value);
+            const r = isDark ? 31 : 255;
+            const g = isDark ? 41 : 255;
+            const b = isDark ? 55 : 255;
+            // The overlay alpha is inversely proportional to desired image visibility
+            // We use a lighter alpha if we have a dedicated layer for better contrast
+            const bgAlpha = bgLayer ? 0.75 : (1 - opacity);
+            editor.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${bgAlpha})`;
+        } else {
+            const color = isDark ? '#1f2937' : '#ffffff';
+            editor.style.backgroundColor = color;
+        }
         editor.style.color = isDark ? '#f5f5f5' : '#1f2937';
     }
 }
@@ -220,6 +269,142 @@ const displayFailedAutoSave = () => {
 // auto save support
 let autoSaveTimer = null;
 
+// Background Image Logic
+let currentBgImage = null;
+
+function openBgModal() {
+    bgModal.classList.remove('hidden');
+}
+
+function closeBgModal() {
+    bgModal.classList.add('hidden');
+}
+
+function handleBgUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        currentBgImage = e.target.result;
+        bgPreview.style.backgroundImage = `url(${currentBgImage})`;
+        bgPreviewPlaceholder.classList.add('hidden');
+        updateBgPreview();
+    };
+    reader.readAsDataURL(file);
+}
+
+function updateBgPreview() {
+    const opacity = bgOpacity.value;
+    const scale = bgScale.value;
+    const posX = bgPosX.value;
+    const posY = bgPosY.value;
+
+    document.getElementById('opacityVal').textContent = Math.round(opacity * 100) + '%';
+    document.getElementById('scaleVal').textContent = scale + '%';
+    document.getElementById('posXVal').textContent = posX + '%';
+    document.getElementById('posYVal').textContent = posY + '%';
+
+    if (currentBgImage) {
+        bgPreview.style.opacity = opacity;
+        bgPreview.style.backgroundSize = `${scale}%`;
+        bgPreview.style.backgroundPosition = `${posX}% ${posY}%`;
+    }
+}
+
+function clearBg() {
+    currentBgImage = null;
+    bgPreview.style.backgroundImage = 'none';
+    bgPreviewPlaceholder.classList.remove('hidden');
+    bgInput.value = '';
+    
+    // reset values
+    bgOpacity.value = 0.5;
+    bgScale.value = 100;
+    bgPosX.value = 50;
+    bgPosY.value = 50;
+    updateBgPreview();
+}
+
+function applyBgSettings() {
+    const settings = {
+        image: currentBgImage,
+        opacity: parseFloat(bgOpacity.value),
+        scale: parseInt(bgScale.value),
+        posX: parseInt(bgPosX.value),
+        posY: parseInt(bgPosY.value)
+    };
+    
+    applyBgSettingsToEditor(settings);
+    // Explicitly update theme icons to apply the alpha overlay
+    updateThemeIcons();
+    scheduleAutoSave();
+    closeBgModal();
+}
+
+function applyBgSettingsToEditor(settings) {
+    if (!settings || !settings.image) {
+        if (bgLayer) {
+            bgLayer.style.backgroundImage = 'none';
+            bgLayer.style.opacity = '0';
+        }
+        editor.style.backgroundImage = 'none';
+        editor.style.backgroundColor = '';
+        currentBgImage = null;
+        updateThemeIcons();
+        return;
+    }
+
+    currentBgImage = settings.image;
+    
+    if (bgLayer) {
+        bgLayer.style.backgroundImage = `url(${settings.image})`;
+        bgLayer.style.backgroundRepeat = 'no-repeat';
+        bgLayer.style.backgroundSize = `${settings.scale}%`;
+        bgLayer.style.backgroundPosition = `${settings.posX}% ${settings.posY}%`;
+        bgLayer.style.opacity = settings.opacity;
+        
+        // Match the textarea dimensions/position
+        const rect = editor.getBoundingClientRect();
+        bgLayer.style.position = 'fixed';
+        bgLayer.style.left = rect.left + 'px';
+        bgLayer.style.top = rect.top + 'px';
+        bgLayer.style.width = rect.width + 'px';
+        bgLayer.style.height = rect.height + 'px';
+    } else {
+        // Fallback for safety
+        editor.style.backgroundImage = `url(${settings.image})`;
+        editor.style.backgroundRepeat = 'no-repeat';
+        editor.style.backgroundAttachment = 'local';
+        editor.style.backgroundSize = `${settings.scale}%`;
+        editor.style.backgroundPosition = `${settings.posX}% ${settings.posY}%`;
+    }
+    
+    // We update the background color to include opacity logic
+    updateThemeIcons(); 
+}
+
+/** 
+ * This helper populates the modal and applies settings from a data object 
+ */
+function applyBgSettingsFromData(settings) {
+    if (!settings) return;
+    
+    currentBgImage = settings.image;
+    bgOpacity.value = settings.opacity || 0.5;
+    bgScale.value = settings.scale || 100;
+    bgPosX.value = settings.posX || 50;
+    bgPosY.value = settings.posY || 50;
+
+    if (currentBgImage) {
+        bgPreview.style.backgroundImage = `url(${currentBgImage})`;
+        bgPreviewPlaceholder.classList.add('hidden');
+    }
+    
+    updateBgPreview();
+    applyBgSettingsToEditor(settings);
+}
+
 function scheduleAutoSave() {
     // clear previous timer and set a new one for 5 seconds later
     if (autoSaveTimer) clearTimeout(autoSaveTimer);
@@ -232,7 +417,14 @@ function scheduleAutoSave() {
                 fontSize.value,
                 lineHeight ? lineHeight.value : undefined,
                 document.body.classList.contains('dark') ? 'dark' : 'light',
-                new Date().toISOString()
+                new Date().toISOString(),
+                currentBgImage ? {
+                    image: currentBgImage,
+                    opacity: parseFloat(bgOpacity.value),
+                    scale: parseInt(bgScale.value),
+                    posX: parseInt(bgPosX.value),
+                    posY: parseInt(bgPosY.value)
+                } : null
             );
             localStorage.setItem('utf8JisArtProject', project.toJson());
         } catch (e) {
@@ -273,7 +465,14 @@ function saveProject() {
         fontSize.value,
         lineHeight ? lineHeight.value : undefined,
         document.body.classList.contains('dark') ? 'dark' : 'light',
-        new Date().toISOString()
+        new Date().toISOString(),
+        currentBgImage ? {
+            image: currentBgImage,
+            opacity: parseFloat(bgOpacity.value),
+            scale: parseInt(bgScale.value),
+            posX: parseInt(bgPosX.value),
+            posY: parseInt(bgPosY.value)
+        } : null
     );
     downloadFile(project.toJson(), 'art_project.json', 'application/json');
 }
@@ -348,6 +547,9 @@ async function loadFile(event) {
             fontSelect.value = project.font;
             fontSize.value = project.size;
             if (project.lineHeight && lineHeight) lineHeight.value = project.lineHeight;
+            if (project.bgSettings) {
+                applyBgSettingsFromData(project.bgSettings);
+            }
             if (project.theme === 'dark') {
                 document.body.classList.add('dark');
             } else if (project.theme === 'light') {
