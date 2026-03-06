@@ -369,7 +369,7 @@ function applyBgSettings() {
     applyBgSettingsToEditor(settings);
     // Explicitly update theme icons to apply the alpha overlay
     updateThemeIcons();
-    scheduleAutoSave();
+    saveToLocalStorage();
     closeBgModal();
 }
 
@@ -438,36 +438,40 @@ function applyBgSettingsFromData(settings) {
     applyBgSettingsToEditor(settings);
 }
 
+function saveToLocalStorage() {
+    try {
+        const project = new Project(
+            editor.value,
+            fontSelect.value,
+            fontSize.value,
+            lineHeight ? lineHeight.value : undefined,
+            document.body.classList.contains('dark') ? 'dark' : 'light',
+            new Date().toISOString(),
+            currentBgImage ? {
+                image: currentBgImage,
+                opacity: parseFloat(bgOpacity.value),
+                scale: parseInt(bgScale.value),
+                posX: parseInt(bgPosX.value),
+                posY: parseInt(bgPosY.value)
+            } : null
+        );
+        localStorage.setItem('utf8JisArtProject', project.toJson());
+        return true;
+    } catch (e) {
+        console.warn('save to localStorage failed', e);
+        displayFailedAutoSave();
+        return false;
+    }
+}
+
 function scheduleAutoSave() {
     // clear previous timer and set a new one for 5 seconds later
     if (autoSaveTimer) clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(() => {
         toggleSavingIndicator(true);
-        try {
-            const project = new Project(
-                editor.value,
-                fontSelect.value,
-                fontSize.value,
-                lineHeight ? lineHeight.value : undefined,
-                document.body.classList.contains('dark') ? 'dark' : 'light',
-                new Date().toISOString(),
-                currentBgImage ? {
-                    image: currentBgImage,
-                    opacity: parseFloat(bgOpacity.value),
-                    scale: parseInt(bgScale.value),
-                    posX: parseInt(bgPosX.value),
-                    posY: parseInt(bgPosY.value)
-                } : null
-            );
-            localStorage.setItem('utf8JisArtProject', project.toJson());
-        } catch (e) {
-            console.warn('auto-save failed', e);
-            displayFailedAutoSave();
-        }
+        saveToLocalStorage();
         autoSaveTimer = null;
-
         setTimeout(() => toggleSavingIndicator(false), 1000);
-    
     }, 5000);
 }
 
