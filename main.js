@@ -84,6 +84,7 @@ const fontSize = document.getElementById('fontSize');
 const palette = document.getElementById('symbolPalette');
 const paletteButtons = document.getElementById('palette-buttons');
 const lineHeight = document.getElementById('lineHeight');
+const byteCounter = document.getElementById('byteCounter');
 
 // Background parameters
 const bgModal = document.getElementById('bgModal');
@@ -107,7 +108,8 @@ const SYMBOLS = [
 const TOP_QUICK_SYMBOLS = ['█', '▓', '▒', '░', '─', '│'];
 
 function init() {
-    const locale = new LocaleHelper()
+    localeHelper = new LocaleHelper();
+    const locale = localeHelper;
 
     const desktopMinWidth = 1024; // Standard threshold for desktop
     const hasAlerted = sessionStorage.getItem('deviceAlertShown');
@@ -162,6 +164,7 @@ function init() {
     // Set initial state
     updateFont();
     updateThemeIcons();
+    updateByteCount();
     makeFloatingBarDraggable();
     
     // Ensure the background layer matches the editor on resize
@@ -185,6 +188,7 @@ function insertAtCursor(text) {
     editor.value = currentText.substring(0, start) + text + currentText.substring(end);
     editor.focus();
     editor.selectionStart = editor.selectionEnd = start + text.length;
+    updateByteCount();
 }
 
 function updateFont() {
@@ -242,6 +246,8 @@ function exportTxt() {
 
 const indicator = document.getElementById('savingIndicator');
 
+let localeHelper; // global reference for updates
+
 const toggleSavingIndicator = (show) => {
     if (!indicator) return;
     if (show) {
@@ -252,6 +258,16 @@ const toggleSavingIndicator = (show) => {
         indicator.classList.add('opacity-0', 'pointer-events-none');
     }
 };
+
+function updateByteCount() {
+    if (!byteCounter || !editor) return;
+    const text = editor.value;
+    const bytes = new TextEncoder().encode(text).length;
+    
+    // Fallback to English if localeHelper isn't ready, otherwise use localized string
+    const format = localeHelper ? localeHelper.msg('byteCount') : "{count} Bytes";
+    byteCounter.textContent = format.replace('{count}', bytes);
+}
 
 const displayFailedAutoSave = () => {
     if (!indicator) return;
@@ -440,7 +456,10 @@ function scheduleAutoSave() {
 
 // attach listeners that should trigger auto save
 if (editor) {
-    editor.addEventListener('input', scheduleAutoSave);
+    editor.addEventListener('input', () => {
+        scheduleAutoSave();
+        updateByteCount();
+    });
 }
 if (fontSelect) {
     fontSelect.addEventListener('change', scheduleAutoSave);
