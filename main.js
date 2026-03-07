@@ -1,5 +1,27 @@
 // Make floating bar draggable
 
+// Background Settings logic
+class BGSettings {
+    constructor(image = null, opacity = 0.5, scale = 100, posX = 50, posY = 50) {
+        this.image = image;
+        this.opacity = opacity;
+        this.scale = scale;
+        this.posX = posX;
+        this.posY = posY;
+    }
+
+    static fromObject(obj) {
+        if (!obj) return null;
+        return new BGSettings(
+            obj.image,
+            obj.opacity !== undefined ? obj.opacity : 0.5,
+            obj.scale || 100,
+            obj.posX !== undefined ? obj.posX : 50,
+            obj.posY !== undefined ? obj.posY : 50
+        );
+    }
+}
+
 // project data wrapper
 class Project {
     constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80) {
@@ -9,7 +31,7 @@ class Project {
         this.lineHeight = lineHeight;
         this.theme = theme;
         this.timestamp = timestamp;
-        this.bgSettings = bgSettings;
+        this.bgSettings = bgSettings instanceof BGSettings ? bgSettings : BGSettings.fromObject(bgSettings);
         this.guidePos = guidePos;
         this.maxLen = maxLen;
     }
@@ -414,6 +436,20 @@ function handleBgUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Restrictions: PNG/JPG, < 3MB
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+        alert(localeHelper ? localeHelper.msg('errImgType') : "Only PNG and JPG/JPEG are allowed.");
+        event.target.value = '';
+        return;
+    }
+
+    if (file.size > 3 * 1024 * 1024) {
+        alert(localeHelper ? localeHelper.msg('errImgSize') : "Image must be < 3MB.");
+        event.target.value = '';
+        return;
+    }
+
     const reader = new FileReader();
     reader.onload = (e) => {
         currentBgImage = e.target.result;
@@ -539,6 +575,14 @@ function applyBgSettingsFromData(settings) {
 
 function saveToLocalStorage() {
     try {
+        const bg = currentBgImage ? new BGSettings(
+            currentBgImage,
+            parseFloat(bgOpacity.value),
+            parseInt(bgScale.value),
+            parseInt(bgPosX.value),
+            parseInt(bgPosY.value)
+        ) : null;
+
         const project = new Project(
             editor.value,
             fontSelect.value,
@@ -546,13 +590,7 @@ function saveToLocalStorage() {
             lineHeight ? lineHeight.value : undefined,
             document.body.classList.contains('dark') ? 'dark' : 'light',
             new Date().toISOString(),
-            currentBgImage ? {
-                image: currentBgImage,
-                opacity: parseFloat(bgOpacity.value),
-                scale: parseInt(bgScale.value),
-                posX: parseInt(bgPosX.value),
-                posY: parseInt(bgPosY.value)
-            } : null,
+            bg,
             guidePosInput ? parseInt(guidePosInput.value) : 400,
             maxLenInput ? parseInt(maxLenInput.value) : 80
         );
@@ -600,6 +638,14 @@ function scheduleAutoSaveWithTheme() {
 
 
 function saveProject() {
+    const bg = currentBgImage ? new BGSettings(
+        currentBgImage,
+        parseFloat(bgOpacity.value),
+        parseInt(bgScale.value),
+        parseInt(bgPosX.value),
+        parseInt(bgPosY.value)
+    ) : null;
+
     const project = new Project(
         editor.value,
         fontSelect.value,
@@ -607,13 +653,9 @@ function saveProject() {
         lineHeight ? lineHeight.value : undefined,
         document.body.classList.contains('dark') ? 'dark' : 'light',
         new Date().toISOString(),
-        currentBgImage ? {
-            image: currentBgImage,
-            opacity: parseFloat(bgOpacity.value),
-            scale: parseInt(bgScale.value),
-            posX: parseInt(bgPosX.value),
-            posY: parseInt(bgPosY.value)
-        } : null
+        bg,
+        guidePosInput ? parseInt(guidePosInput.value) : 400,
+        maxLenInput ? parseInt(maxLenInput.value) : 80
     );
     downloadFile(project.toJson(), 'art_project.json', 'application/json');
 }
