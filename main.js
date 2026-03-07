@@ -24,7 +24,7 @@ class BGSettings {
 
 // project data wrapper
 class Project {
-    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80) {
+    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80, symbolData = null) {
         this.content = content;
         this.font = font;
         this.size = size;
@@ -34,6 +34,7 @@ class Project {
         this.bgSettings = bgSettings instanceof BGSettings ? bgSettings : BGSettings.fromObject(bgSettings);
         this.guidePos = guidePos;
         this.maxLen = maxLen;
+        this.symbolData = symbolData;
     }
 
     toJSON() {
@@ -47,7 +48,8 @@ class Project {
             timestamp: this.timestamp,
             bgSettings: this.bgSettings,
             guidePos: this.guidePos,
-            maxLen: this.maxLen
+            maxLen: this.maxLen,
+            symbolData: this.symbolData
         };
     }
 
@@ -62,7 +64,8 @@ class Project {
             obj.timestamp || "",
             obj.bgSettings || null,
             obj.guidePos !== undefined ? obj.guidePos : 400,
-            obj.maxLen !== undefined ? obj.maxLen : 80
+            obj.maxLen !== undefined ? obj.maxLen : 80,
+            obj.symbolData || null
         );
     }
 
@@ -136,7 +139,80 @@ const SYMBOLS = [
     '▖', '▗', '▘', '▙', '▚', '▛', '▜', '▝', '▞', '▟'
 ];
 
+class SymbolManager {
+    constructor(favorites = null) {
+        this.fullList = SYMBOLS;
+        // If favorites provided (from project), use them. Otherwise take first 10.
+        this.favorites = favorites || this.fullList.slice(0, 10);
+    }
+
+    use(char, fromGallery = false) {
+        // Insert character
+        insertAtCursor(char);
+        
+        const index = this.favorites.indexOf(char);
+        
+        if (index !== -1) {
+            // If already in list, if it's from the gallery we MIGHT want to push to top,
+            // but the user says it's annoying to have them move after clicking.
+            // So if it's in the list, just leave it where it is for stability.
+            return;
+        }
+
+        // If NOT in list (must be from gallery), replace the LAST item and push this one to TOP
+        this.favorites.pop();
+        this.favorites.unshift(char);
+        
+        // UI updates
+        renderSymbolBar();
+    }
+
+    getFavorites() {
+        return this.favorites;
+    }
+}
+
+let symbolManager;
+let currentSymbolData = null;
+
 const TOP_QUICK_SYMBOLS = ['█', '▓', '▒', '░', '─', '│'];
+
+function openSymbolGallery() {
+    document.getElementById('symbolGalleryModal').classList.remove('hidden');
+    renderSymbolGallery();
+}
+
+function closeSymbolGallery() {
+    document.getElementById('symbolGalleryModal').classList.add('hidden');
+}
+
+function renderSymbolBar() {
+    const paletteButtons = document.getElementById('palette-buttons');
+    if (!paletteButtons) return;
+    
+    paletteButtons.innerHTML = '';
+    symbolManager.getFavorites().forEach(sym => {
+        const btn = document.createElement('button');
+        btn.className = "w-8 h-8 flex items-center justify-center text-lg rounded hover:bg-neutral-200 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-200 transition-colors font-mono";
+        btn.innerText = sym;
+        btn.onclick = () => symbolManager.use(sym);
+        paletteButtons.appendChild(btn);
+    });
+}
+
+function renderSymbolGallery() {
+    const grid = document.getElementById('symbolGalleryGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    symbolManager.fullList.forEach(sym => {
+        const btn = document.createElement('button');
+        btn.className = "w-10 h-10 flex items-center justify-center text-xl rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 dark:hover:border-blue-700 text-neutral-800 dark:text-neutral-200 transition-all font-mono";
+        btn.innerText = sym;
+        btn.onclick = () => symbolManager.use(sym, true);
+        grid.appendChild(btn);
+    });
+}
 
 function init() {
     localeHelper = new LocaleHelper();
@@ -174,28 +250,15 @@ function init() {
             if (project.bgSettings) {
                 applyBgSettingsFromData(project.bgSettings);
             }
+            currentSymbolData = project.symbolData;
         } catch (e) {
             console.warn('failed to parse autosaved project', e);
         }
     }
 
-    // Build Side Palette
-    SYMBOLS.forEach(sym => {
-        const btn = document.createElement('button');
-        btn.className = "w-8 h-8 flex items-center justify-center text-lg rounded hover:bg-neutral-200 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-200 transition-colors font-mono";
-        btn.innerText = sym;
-        btn.onclick = () => insertAtCursor(sym);
-        palette.appendChild(btn);
-    });
+    symbolManager = new SymbolManager(currentSymbolData);
 
-    // Build Top Quick Bar
-    // TOP_QUICK_SYMBOLS.forEach(sym => {
-    //     const btn = document.createElement('button');
-    //     btn.className = "w-8 h-8 flex items-center justify-center text-sm rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 transition-colors font-mono";
-    //     btn.innerText = sym;
-    //     btn.onclick = () => insertAtCursor(sym);
-    //     paletteButtons.appendChild(btn);
-    // });
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
 
     // Set initial state
     updateFont();
@@ -203,7 +266,9 @@ function init() {
     updateByteCount();
     updateGuide();
     makeFloatingBarDraggable();
-    
+
+    renderSymbolBar();
+
     // Ensure the background layer matches the editor on resize
     if (window.ResizeObserver && editor && bgLayer) {
         const ro = new ResizeObserver(() => {
@@ -609,7 +674,8 @@ function saveToLocalStorage() {
             new Date().toISOString(),
             bg,
             guidePosInput ? parseInt(guidePosInput.value) : 400,
-            maxLenInput ? parseInt(maxLenInput.value) : 80
+            maxLenInput ? parseInt(maxLenInput.value) : 80,
+            symbolManager ? symbolManager.getFavorites() : null
         );
         localStorage.setItem('utf8JisArtProject', project.toJson());
         return true;
@@ -672,7 +738,8 @@ function saveProject() {
         new Date().toISOString(),
         bg,
         guidePosInput ? parseInt(guidePosInput.value) : 400,
-        maxLenInput ? parseInt(maxLenInput.value) : 80
+        maxLenInput ? parseInt(maxLenInput.value) : 80,
+        symbolManager ? symbolManager.getFavorites() : null
     );
     downloadFile(project.toJson(), 'art_project.json', 'application/json');
 }

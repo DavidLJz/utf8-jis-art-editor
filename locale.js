@@ -18,7 +18,10 @@ class LocaleHelper {
         byteCount: "{count} Bytes",
         deviceAlert: "This site is optimized for desktop. Your current screen size may affect the experience.",
         guidePos: "Guide (px)",
-        maxLen: "Max line chars",
+        maxLen: "Max line characters",
+        showAllSymbols: "Show All",
+        symbolGalleryTitle: "Symbol Gallery",
+        close: "Close",
         errImgType: "Only PNG and JPG/JPEG images are allowed.",
         errImgSize: "Image size must be less than 3MB."
     };
@@ -43,6 +46,9 @@ class LocaleHelper {
         deviceAlert: "Este sitio está optimizado para escritorio. El tamaño de pantalla actual puede afectar la experiencia.",
         guidePos: "Guía (px)",
         maxLen: "Máx caract/línea",
+        showAllSymbols: "Ver todo",
+        symbolGalleryTitle: "Galería de Símbolos",
+        close: "Cerrar",
         errImgType: "Solo se permiten imágenes PNG y JPG/JPEG.",
         errImgSize: "La imagen debe ser menor a 3MB."
     };
