@@ -51,6 +51,19 @@
     color: inherit;
 }
 
+/* Character limit feedback animation */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-1px); }
+    75% { transform: translateX(1px); }
+}
+
+.limit-reached {
+    animation: shake 0.2s ease-in-out 0s 2;
+    border-color: #ef4444 !important; /* tailwind red-500 */
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4) !important;
+}
+
 .floating-bar {
     backdrop-filter: blur(8px);
 }

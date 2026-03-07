@@ -225,6 +225,21 @@ function syncBgLayerSync() {
     bgLayer.style.height = rect.height + 'px';
 }
 
+function showLimitFeedback() {
+    const container = document.getElementById('editorVisualContainer');
+    if (!container) return;
+    
+    // Reset animation if already playing
+    container.classList.remove('limit-reached');
+    void container.offsetWidth; // Force reflow
+    container.classList.add('limit-reached');
+    
+    // Remove class after animation finishes (0.4s total for 2 shakes)
+    setTimeout(() => {
+        container.classList.remove('limit-reached');
+    }, 400);
+}
+
 function insertAtCursor(text) {
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
@@ -245,6 +260,7 @@ function insertAtCursor(text) {
                                  lineContent.substring(end - (lastNewline === -1 ? 0 : lastNewline + 1));
 
         if (lineContentAfter.length > max) {
+            showLimitFeedback();
             return;
         }
     }
@@ -328,6 +344,7 @@ if (editor) {
 
         if (lineContentAfter.length > max) {
             e.preventDefault();
+            showLimitFeedback();
         }
     });
 }
