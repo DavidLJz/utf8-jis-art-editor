@@ -2,7 +2,7 @@
 
 // project data wrapper
 class Project {
-    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null) {
+    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80) {
         this.content = content;
         this.font = font;
         this.size = size;
@@ -10,6 +10,8 @@ class Project {
         this.theme = theme;
         this.timestamp = timestamp;
         this.bgSettings = bgSettings;
+        this.guidePos = guidePos;
+        this.maxLen = maxLen;
     }
 
     toJSON() {
@@ -21,7 +23,9 @@ class Project {
             lineHeight: this.lineHeight,
             theme: this.theme,
             timestamp: this.timestamp,
-            bgSettings: this.bgSettings
+            bgSettings: this.bgSettings,
+            guidePos: this.guidePos,
+            maxLen: this.maxLen
         };
     }
 
@@ -34,7 +38,9 @@ class Project {
             obj.lineHeight,
             obj.theme || "light",
             obj.timestamp || "",
-            obj.bgSettings || null
+            obj.bgSettings || null,
+            obj.guidePos !== undefined ? obj.guidePos : 400,
+            obj.maxLen !== undefined ? obj.maxLen : 80
         );
     }
 
@@ -80,6 +86,9 @@ function makeFloatingBarDraggable() {
 const editor = document.getElementById('editor');
 const fontSelect = document.getElementById('fontSelect');
 const fontSize = document.getElementById('fontSize');
+const guidePosInput = document.getElementById('guidePos');
+const maxLenInput = document.getElementById('maxLen');
+const guideRule = document.getElementById('guideRule');
 
 const palette = document.getElementById('symbolPalette');
 const paletteButtons = document.getElementById('palette-buttons');
@@ -130,6 +139,8 @@ function init() {
             fontSelect.value = project.font;
             fontSize.value = project.size;
             if (project.lineHeight && lineHeight) lineHeight.value = project.lineHeight;
+            if (guidePosInput) guidePosInput.value = project.guidePos;
+            if (maxLenInput) maxLenInput.value = project.maxLen;
             
             if (project.theme === 'dark') {
                 document.body.classList.add('dark');
@@ -168,6 +179,7 @@ function init() {
     updateFont();
     updateThemeIcons();
     updateByteCount();
+    updateGuide();
     makeFloatingBarDraggable();
     
     // Ensure the background layer matches the editor on resize
@@ -194,11 +206,33 @@ function syncBgLayerSync() {
 function insertAtCursor(text) {
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
+    const max = maxLenInput ? parseInt(maxLenInput.value) : 0;
+    
+    if (max > 0) {
+        const currentText = editor.value;
+        const lastNewline = currentText.lastIndexOf('\n', start - 1);
+        const nextNewline = currentText.indexOf('\n', start);
+        
+        const lineContent = currentText.substring(
+            lastNewline === -1 ? 0 : lastNewline + 1,
+            nextNewline === -1 ? currentText.length : nextNewline
+        );
+
+        const lineContentAfter = lineContent.substring(0, start - (lastNewline === -1 ? 0 : lastNewline + 1)) + 
+                                 text + 
+                                 lineContent.substring(end - (lastNewline === -1 ? 0 : lastNewline + 1));
+
+        if (lineContentAfter.length > max) {
+            return;
+        }
+    }
+
     const currentText = editor.value;
     editor.value = currentText.substring(0, start) + text + currentText.substring(end);
     editor.focus();
     editor.selectionStart = editor.selectionEnd = start + text.length;
     updateByteCount();
+    saveToLocalStorage();
 }
 
 function updateFont() {
@@ -212,6 +246,68 @@ function updateFont() {
 function toggleTheme() {
     document.body.classList.toggle('dark');
     updateThemeIcons();
+}
+
+function updateGuide() {
+    if (!guideRule || !guidePosInput) return;
+    const pos = parseInt(guidePosInput.value);
+    if (!isNaN(pos)) {
+        guideRule.style.left = pos + 'px';
+        if (pos > 0) {
+            guideRule.classList.remove('hidden');
+        } else {
+            guideRule.classList.add('hidden');
+        }
+    }
+}
+
+function updateMaxLen() {
+    saveToLocalStorage();
+}
+
+if (editor) {
+    editor.addEventListener('beforeinput', (e) => {
+        // console.log('beforeinput event:', e.inputType, e.data);
+
+        if (!maxLenInput) return;
+        const max = parseInt(maxLenInput.value);
+        if (isNaN(max) || max <= 0) return;
+
+        // Ignore pasted text to allow importing art from external sources
+        if (e.inputType === 'insertFromPaste') {
+            return;
+        }
+
+        let textToInsert = "";
+        if (e.inputType === 'insertText') {
+            textToInsert = e.data;
+        } else {
+            return;
+        }
+
+        if (!textToInsert) return;
+
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        const currentText = editor.value;
+
+        // Simulation for single character typing
+        const lastNewline = currentText.lastIndexOf('\n', start - 1);
+        const nextNewline = currentText.indexOf('\n', start);
+        
+        const lineContent = currentText.substring(
+            lastNewline === -1 ? 0 : lastNewline + 1,
+            nextNewline === -1 ? currentText.length : nextNewline
+        );
+
+        const lineContentAfter = lineContent.substring(0, start - (lastNewline === -1 ? 0 : lastNewline + 1)) + 
+                                 textToInsert + 
+                                 lineContent.substring(end - (lastNewline === -1 ? 0 : lastNewline + 1));
+
+        if (lineContentAfter.length > max) {
+            e.preventDefault();
+        }
+    });
 }
 
 function updateThemeIcons() {
@@ -456,7 +552,9 @@ function saveToLocalStorage() {
                 scale: parseInt(bgScale.value),
                 posX: parseInt(bgPosX.value),
                 posY: parseInt(bgPosY.value)
-            } : null
+            } : null,
+            guidePosInput ? parseInt(guidePosInput.value) : 400,
+            maxLenInput ? parseInt(maxLenInput.value) : 80
         );
         localStorage.setItem('utf8JisArtProject', project.toJson());
         return true;

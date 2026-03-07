@@ -1,6 +1,8 @@
 # ToDo
-- [ ] Show a saving indicator when saving to local storage
-- [ ] Autosave contents and config to local storage
+- [x] Add ruler guide
+- [x] Add hard limit for characters per line setting
+- [x] Show a saving indicator when saving to local storage
+- [x] Autosave contents and config to local storage
 - [ ] Read only mode
 - [x] Fix theme toggle not working on the text input
 - [x] Allow Resizing the text input

@@ -85,6 +85,21 @@
         <!-- Divider -->
         <div class="h-6 w-px bg-neutral-300 dark:bg-neutral-600 mx-1"></div>
 
+        <!-- Guide Position -->
+        <div class="flex items-center space-x-1">
+            <label for="guidePos" class="text-xs font-bold text-neutral-800 dark:text-neutral-200" data-i18n="guidePos">Guide (px)</label>
+            <input type="number" id="guidePos" value="400" min="0" max="2000" step="10" oninput="updateGuide()" class="w-12 bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 text-neutral-800 dark:text-neutral-200 text-center [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" title="Guide Position" style="-moz-appearance: textfield; appearance: textfield;">
+        </div>
+
+        <!-- Max Length -->
+        <div class="flex items-center space-x-1">
+            <label for="maxLen" class="text-xs font-bold text-neutral-800 dark:text-neutral-200" data-i18n="maxLen">Max line chars</label>
+            <input type="number" id="maxLen" value="80" min="0" max="1000" onchange="updateMaxLen()" class="w-10 bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 text-neutral-800 dark:text-neutral-200 text-center [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" title="Max Line Length" style="-moz-appearance: textfield; appearance: textfield;">
+        </div>
+
+        <!-- Divider -->
+        <div class="h-6 w-px bg-neutral-300 dark:bg-neutral-600 mx-1"></div>
+
         <!-- Theme Toggle -->
         <button onclick="toggleTheme()" class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors text-neutral-800 dark:text-neutral-200" title="Toggle Light/Dark Mode">
             <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"></path></svg>
@@ -169,6 +184,9 @@
         <!-- Visual Wrapper (Artificial Padding) -->
         <div id="editorVisualContainer" class="w-full max-w-[80vw] h-full max-h-[80vh] bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 p-6 overflow-hidden flex flex-col transition-colors duration-300">
             <div class="w-full h-full relative">
+                <!-- Visual Guide Rule -->
+                <div id="guideRule" class="absolute top-0 bottom-0 w-px bg-red-500/30 dark:bg-red-400/30 z-20 pointer-events-none transition-all hidden" style="left: 400px;"></div>
+
                 <!-- Background Layer -->
                 <div id="editorBgLayer" class="absolute inset-0 z-0 pointer-events-none bg-no-repeat rounded-lg opacity-0" style="padding: 0; background-origin: padding-box;"></div>
                 

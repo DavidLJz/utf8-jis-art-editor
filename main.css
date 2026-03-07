@@ -19,12 +19,26 @@
     resize: none;
     line-height: 1.2;
     white-space: pre;
-    overflow: auto;
+    overflow-x: scroll !important;
+    overflow-y: auto;
     tab-size: 4;
     background-repeat: no-repeat !important;
     background-origin: padding-box;
     background-attachment: local;
     outline: none !important;
+}
+
+#editorVisualContainer {
+    overflow: hidden !important;
+}
+
+#editorVisualContainer > div.relative {
+    overflow: hidden !important;
+}
+
+#guideRule {
+    height: 100%;
+    pointer-events: none;
 }
 
 #editor:focus {

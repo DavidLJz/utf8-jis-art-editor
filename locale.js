@@ -16,7 +16,9 @@ class LocaleHelper {
         explorePara: "You can find some examples of UTF-8 art <a href=\"http://anime.en.utf8art.com/tag/patchouli-knowledge\" class=\"text-blue-600 dark:text-blue-400 hover:underline\" target=\"_blank\" rel=\"noopener\">in this link.</a>",
         footerCopy: "&copy; 2024 UTF-8 Art Editor. MIT License.",
         byteCount: "{count} Bytes",
-        deviceAlert: "This site is optimized for desktop. Your current screen size may affect the experience."
+        deviceAlert: "This site is optimized for desktop. Your current screen size may affect the experience.",
+        guidePos: "Guide (px)",
+        maxLen: "Max line chars"
     };
 
     static ES = {
@@ -36,7 +38,9 @@ class LocaleHelper {
         explorePara: "Puedes encontrar algunos ejemplos de arte UTF-8 <a href=\"http://anime.en.utf8art.com/tag/patchouli-knowledge\" class=\"text-blue-600 dark:text-blue-400 hover:underline\" target=\"_blank\" rel=\"noopener\">en este enlace.</a>",
         footerCopy: "&copy; 2024 UTF-8 Art Editor. Licencia MIT.",
         byteCount: "{count} Bytes",
-        deviceAlert: "Este sitio está optimizado para escritorio. El tamaño de pantalla actual puede afectar la experiencia."
+        deviceAlert: "Este sitio está optimizado para escritorio. El tamaño de pantalla actual puede afectar la experiencia.",
+        guidePos: "Guía (px)",
+        maxLen: "Máx caract/línea"
     };
 
     constructor() {
