@@ -1,6 +1,7 @@
 # ToDo
 - [x] Add ruler guide
 - [x] Add hard limit for characters per line setting
+- [ ] Select cell and replace with any input character (currently only works with the last used character)
 - [x] Show a saving indicator when saving to local storage
 - [x] Autosave contents and config to local storage
 - [ ] Read only mode
