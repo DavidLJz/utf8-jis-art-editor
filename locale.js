@@ -59,7 +59,11 @@ class LocaleHelper {
         if (k in this.lang) {
             return this.lang[k];
         }
-        throw new Error('value for ' + k + ' not found in lang: ' + navigator.language);
+        // Fallback to English if current lang is not English
+        if (this.lang !== LocaleHelper.EN && k in LocaleHelper.EN) {
+            return LocaleHelper.EN[k];
+        }
+        throw new Error('value for ' + k + ' not found in lang dictionary');
     }
 
     apply() {

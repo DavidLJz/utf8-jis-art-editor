@@ -400,8 +400,8 @@ function updateByteCount() {
     const text = editor.value;
     const bytes = new TextEncoder().encode(text).length;
     
-    // Fallback to English if localeHelper isn't ready, otherwise use localized string
-    const format = localeHelper ? localeHelper.msg('byteCount') : "{count} Bytes";
+    // Use localized string with fallback
+    const format = localeHelper.msg('byteCount');
     byteCounter.textContent = format.replace('{count}', bytes);
 }
 
@@ -439,13 +439,13 @@ function handleBgUpload(event) {
     // Restrictions: PNG/JPG, < 3MB
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
     if (!allowedTypes.includes(file.type)) {
-        alert(localeHelper ? localeHelper.msg('errImgType') : "Only PNG and JPG/JPEG are allowed.");
+        alert(localeHelper.msg('errImgType'));
         event.target.value = '';
         return;
     }
 
     if (file.size > 3 * 1024 * 1024) {
-        alert(localeHelper ? localeHelper.msg('errImgSize') : "Image must be < 3MB.");
+        alert(localeHelper.msg('errImgSize'));
         event.target.value = '';
         return;
     }
