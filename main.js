@@ -24,7 +24,7 @@ class BGSettings {
 
 // project data wrapper
 class Project {
-    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80, symbolData = null) {
+    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80, symbolData = null, gridEnabled = true, gridX = 20, gridY = 20) {
         this.content = content;
         this.font = font;
         this.size = size;
@@ -35,6 +35,9 @@ class Project {
         this.guidePos = guidePos;
         this.maxLen = maxLen;
         this.symbolData = symbolData;
+        this.gridEnabled = gridEnabled;
+        this.gridX = gridX;
+        this.gridY = gridY;
     }
 
     toJSON() {
@@ -49,7 +52,10 @@ class Project {
             bgSettings: this.bgSettings,
             guidePos: this.guidePos,
             maxLen: this.maxLen,
-            symbolData: this.symbolData
+            symbolData: this.symbolData,
+            gridEnabled: this.gridEnabled,
+            gridX: this.gridX,
+            gridY: this.gridY
         };
     }
 
@@ -65,7 +71,10 @@ class Project {
             obj.bgSettings || null,
             obj.guidePos !== undefined ? obj.guidePos : 400,
             obj.maxLen !== undefined ? obj.maxLen : 80,
-            obj.symbolData || null
+            obj.symbolData || null,
+            obj.gridEnabled !== undefined ? obj.gridEnabled : true,
+            obj.gridX !== undefined ? obj.gridX : 20,
+            obj.gridY !== undefined ? obj.gridY : 20
         );
     }
 
@@ -114,6 +123,11 @@ const fontSize = document.getElementById('fontSize');
 const guidePosInput = document.getElementById('guidePos');
 const maxLenInput = document.getElementById('maxLen');
 const guideRule = document.getElementById('guideRule');
+
+const gridLayer = document.getElementById('gridLayer');
+const gridToggle = document.getElementById('gridToggle');
+const gridXInput = document.getElementById('gridX');
+const gridYInput = document.getElementById('gridY');
 
 const palette = document.getElementById('symbolPalette');
 const paletteButtons = document.getElementById('palette-buttons');
@@ -250,6 +264,20 @@ function init() {
             if (project.bgSettings) {
                 applyBgSettingsFromData(project.bgSettings);
             }
+
+            // Load grid settings
+            if (gridToggle) {
+                if (project.gridEnabled) {
+                    gridLayer.classList.remove('hidden');
+                    gridToggle.classList.add('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400');
+                } else {
+                    gridLayer.classList.add('hidden');
+                    gridToggle.classList.remove('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400');
+                }
+            }
+            if (gridXInput) gridXInput.value = project.gridX;
+            if (gridYInput) gridYInput.value = project.gridY;
+
             currentSymbolData = project.symbolData;
         } catch (e) {
             console.warn('failed to parse autosaved project', e);
@@ -265,6 +293,7 @@ function init() {
     updateThemeIcons();
     updateByteCount();
     updateGuide();
+    updateGrid();
     makeFloatingBarDraggable();
 
     renderSymbolBar();
@@ -275,9 +304,17 @@ function init() {
             if (currentBgImage) {
                 syncBgLayerSync();
             }
+            syncGridLayer();
         });
         ro.observe(editor);
     }
+}
+
+function syncGridLayer() {
+    if (!gridLayer || !editor) return;
+    const rect = editor.getBoundingClientRect();
+    gridLayer.style.width = rect.width + 'px';
+    gridLayer.style.height = rect.height + 'px';
 }
 
 function syncBgLayerSync() {
@@ -362,6 +399,29 @@ function updateGuide() {
             guideRule.classList.add('hidden');
         }
     }
+}
+
+function updateGrid() {
+    if (!gridLayer || !gridXInput || !gridYInput) return;
+    const x = parseInt(gridXInput.value) || 20;
+    const y = parseInt(gridYInput.value) || 20;
+    
+    gridLayer.style.backgroundSize = `${x}px ${y}px`;
+    saveToLocalStorage();
+}
+
+function toggleGrid() {
+    if (!gridLayer || !gridToggle) return;
+    const isHidden = gridLayer.classList.toggle('hidden');
+    
+    // Toggle active styles for the button
+    if (isHidden) {
+        gridToggle.classList.remove('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400');
+    } else {
+        gridToggle.classList.add('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400');
+    }
+    
+    saveToLocalStorage();
 }
 
 function updateMaxLen() {
@@ -675,7 +735,10 @@ function saveToLocalStorage() {
             bg,
             guidePosInput ? parseInt(guidePosInput.value) : 400,
             maxLenInput ? parseInt(maxLenInput.value) : 80,
-            symbolManager ? symbolManager.getFavorites() : null
+            symbolManager ? symbolManager.getFavorites() : null,
+            gridLayer ? !gridLayer.classList.contains('hidden') : true,
+            gridXInput ? parseInt(gridXInput.value) : 20,
+            gridYInput ? parseInt(gridYInput.value) : 20
         );
         localStorage.setItem('utf8JisArtProject', project.toJson());
         return true;
@@ -739,7 +802,10 @@ function saveProject() {
         bg,
         guidePosInput ? parseInt(guidePosInput.value) : 400,
         maxLenInput ? parseInt(maxLenInput.value) : 80,
-        symbolManager ? symbolManager.getFavorites() : null
+        symbolManager ? symbolManager.getFavorites() : null,
+        gridLayer ? !gridLayer.classList.contains('hidden') : true,
+        gridXInput ? parseInt(gridXInput.value) : 20,
+        gridYInput ? parseInt(gridYInput.value) : 20
     );
     downloadFile(project.toJson(), 'art_project.json', 'application/json');
 }

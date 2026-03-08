@@ -23,7 +23,10 @@ class LocaleHelper {
         symbolGalleryTitle: "Symbol Gallery",
         close: "Close",
         errImgType: "Only PNG and JPG/JPEG images are allowed.",
-        errImgSize: "Image size must be less than 3MB."
+        errImgSize: "Image size must be less than 3MB.",
+        gridToggle: "Toggle Grid Guide",
+        gridX: "Grid X",
+        gridY: "Grid Y"
     };
 
     static ES = {
@@ -50,7 +53,10 @@ class LocaleHelper {
         symbolGalleryTitle: "Galería de Símbolos",
         close: "Cerrar",
         errImgType: "Solo se permiten imágenes PNG y JPG/JPEG.",
-        errImgSize: "La imagen debe ser menor a 3MB."
+        errImgSize: "La imagen debe ser menor a 3MB.",
+        gridToggle: "Alternar Guía de Cuadrícula",
+        gridX: "Cuadrícula X",
+        gridY: "Cuadrícula Y"
     };
 
     constructor() {
