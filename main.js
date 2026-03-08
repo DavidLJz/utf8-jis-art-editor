@@ -204,17 +204,39 @@ const bgPosX = document.getElementById('bgPosX');
 const bgPosY = document.getElementById('bgPosY');
 const bgLayer = document.getElementById('editorBgLayer');
 
-const SYMBOLS = [
-    '█', '▓', '▒', '░', '▄', '▀', '▌', '▐', '■', '□', 
-    '─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼',
-    '═', '║', '╔', '╗', '╚', '╝', '╠', '╣', '╦', '╩', '╬',
-    '╱', '╲', '╳', '▲', '▼', '◀', '▶', '●', '○', '◆', '◇',
-    '▖', '▗', '▘', '▙', '▚', '▛', '▜', '▝', '▞', '▟'
+const SYMBOL_CATEGORIES = [
+    {
+        id: 'standard',
+        titleKey: 'catStandard',
+        symbols: [
+            '█', '▓', '▒', '░', '▄', '▀', '▌', '▐', '■', '□', 
+            '─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼',
+            '═', '║', '╔', '╗', '╚', '╝', '╠', '╣', '╦', '╩', '╬',
+            '╱', '╲', '╳', '▲', '▼', '◀', '▶', '●', '○', '◆', '◇',
+            '▖', '▗', '▘', '▙', '▚', '▛', '▜', '▝', '▞', '▟'
+        ]
+    },
+    {
+        id: 'jis',
+        titleKey: 'catJIS',
+        symbols: [
+            '／', '＼', '⊂', '⊃', '＿', '￣', '〃', '｀', '★', '☆', 
+            '◆', '◇', '▲', '▼', '●', '○', '（', '）', '【', '】', 
+            '「', '」', '『', '』', '‐', '〜', '‐', 'ﾟ', 'o', 'v', 
+            '|', '∠', '∟', '〉', '〈', '〃', '‐', '‐', '｀', '´',
+            '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼', '┠', 
+            '┨', '┯', '┷', '╂', '・', '‥', '…', '━', '┃', '┏', 
+            '┓', '┗', '┛', '┝', '┥', '┰', '┸', '╇', '╈', '╉', 
+            '╊', '╋'
+        ]
+    }
 ];
 
 class SymbolManager {
     constructor(favorites = null) {
-        this.fullList = SYMBOLS;
+        this.categories = SYMBOL_CATEGORIES;
+        // Flatten list for compatibility with palette and search
+        this.fullList = this.categories.flatMap(c => c.symbols);
         // If favorites provided (from project), use them. Otherwise take first 10.
         this.favorites = favorites || this.fullList.slice(0, 10);
     }
@@ -276,14 +298,34 @@ function renderSymbolBar() {
 function renderSymbolGallery() {
     const grid = document.getElementById('symbolGalleryGrid');
     if (!grid) return;
-    
     grid.innerHTML = '';
-    symbolManager.fullList.forEach(sym => {
-        const btn = document.createElement('button');
-        btn.className = "w-10 h-10 flex items-center justify-center text-xl rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 dark:hover:border-blue-700 text-neutral-800 dark:text-neutral-200 transition-all font-mono";
-        btn.innerText = sym;
-        btn.onclick = () => symbolManager.use(sym, true);
-        grid.appendChild(btn);
+
+    symbolManager.categories.forEach(category => {
+        // Create Section container
+        const section = document.createElement('div');
+        section.className = 'space-y-3';
+
+        // Create Header
+        const header = document.createElement('h4');
+        header.className = 'text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest border-b border-neutral-100 dark:border-neutral-700 pb-1';
+        header.setAttribute('data-i18n', category.titleKey);
+        header.textContent = localeHelper.msg(category.titleKey);
+        section.appendChild(header);
+
+        // Create Icon Grid
+        const iconGrid = document.createElement('div');
+        iconGrid.className = 'grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2';
+
+        category.symbols.forEach(sym => {
+            const btn = document.createElement('button');
+            btn.className = "w-10 h-10 flex items-center justify-center text-xl rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 dark:hover:border-blue-700 text-neutral-800 dark:text-neutral-200 transition-all font-mono";
+            btn.innerText = sym;
+            btn.onclick = () => symbolManager.use(sym, true);
+            iconGrid.appendChild(btn);
+        });
+
+        section.appendChild(iconGrid);
+        grid.appendChild(section);
     });
 }
 
