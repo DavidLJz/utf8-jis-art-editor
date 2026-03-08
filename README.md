@@ -2,6 +2,8 @@
 - [x] Add ruler guide
 - [x] Grid guide should be synced with the text size and line height settings
 - [x] Add a Save Button
+- [ ] Change render scale without altering font-size
+- [ ] Customize character palette bar
 - [ ] Add a "Help" section with instructions and keyboard shortcuts
 - [ ] Add a "Tips" section with tips for creating JIS art and using the editor
 - [x] Add hard limit for characters per line setting
