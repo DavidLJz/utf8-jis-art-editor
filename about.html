@@ -70,9 +70,20 @@
             </a> -->
 
             <p class="text-sm text-gray-500 dark:text-gray-400" data-i18n-html="footerCopy">
-                &copy; 2024 AA Studio. MIT License.
+                &copy; <span class="current-year"></span> AA Studio. MIT License.
             </p>
         </div>
     </main>
+
+    <script>
+        function init(){
+            const y = new Date().getFullYear()
+            document.querySelectorAll('.current-year').forEach((e, i) => {
+                e.textContent = y;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
