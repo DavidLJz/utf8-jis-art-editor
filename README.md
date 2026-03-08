@@ -1,6 +1,6 @@
 # ToDo
 - [x] Add ruler guide
-- [ ] Grid guide should be synced with the text size and line height settings
+- [x] Grid guide should be synced with the text size and line height settings
 - [ ] Move Save messages to the right of the screen
 - [x] Add a Save Button
 - [ ] Add a "Help" section with instructions and keyboard shortcuts
@@ -17,3 +17,9 @@
 - [ ] Add custom character palette
 - [ ] Add custom themes
 - [x] Add "Export as Image" option
+
+## Features & Implementation Notes
+### Grid Synchronization
+When the "Sync with Font" option is enabled, the grid adjusts automatically using the following formulas:
+- **Grid X (Horizontal):** `FontSize / 2` (approximate width for half-width characters).
+- **Grid Y (Vertical):** `FontSize * LineHeight` (matches the exact row height).

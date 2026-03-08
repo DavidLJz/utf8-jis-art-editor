@@ -24,7 +24,7 @@ class BGSettings {
 
 // project data wrapper
 class Project {
-    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80, symbolData = null, gridEnabled = true, gridX = 20, gridY = 20) {
+    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80, symbolData = null, gridEnabled = true, gridX = 20, gridY = 20, syncGrid = false) {
         this.content = content;
         this.font = font;
         this.size = size;
@@ -38,6 +38,7 @@ class Project {
         this.gridEnabled = gridEnabled;
         this.gridX = gridX;
         this.gridY = gridY;
+        this.syncGrid = syncGrid;
     }
 
     toJSON() {
@@ -55,7 +56,8 @@ class Project {
             symbolData: this.symbolData,
             gridEnabled: this.gridEnabled,
             gridX: this.gridX,
-            gridY: this.gridY
+            gridY: this.gridY,
+            syncGrid: this.syncGrid
         };
     }
 
@@ -74,7 +76,8 @@ class Project {
             obj.symbolData || null,
             obj.gridEnabled !== undefined ? obj.gridEnabled : true,
             obj.gridX !== undefined ? obj.gridX : 20,
-            obj.gridY !== undefined ? obj.gridY : 20
+            obj.gridY !== undefined ? obj.gridY : 20,
+            obj.syncGrid !== undefined ? obj.syncGrid : false
         );
     }
 
@@ -128,6 +131,7 @@ const gridLayer = document.getElementById('gridLayer');
 const gridToggle = document.getElementById('gridToggle');
 const gridXInput = document.getElementById('gridX');
 const gridYInput = document.getElementById('gridY');
+const syncGridCheckbox = document.getElementById('syncGrid');
 
 const palette = document.getElementById('symbolPalette');
 const paletteButtons = document.getElementById('palette-buttons');
@@ -277,6 +281,10 @@ function init() {
             }
             if (gridXInput) gridXInput.value = project.gridX;
             if (gridYInput) gridYInput.value = project.gridY;
+            if (syncGridCheckbox) {
+                syncGridCheckbox.checked = project.syncGrid;
+                toggleSyncGrid(false); // Update input states without saving immediately
+            }
 
             currentSymbolData = project.symbolData;
         } catch (e) {
@@ -381,6 +389,15 @@ function updateFont() {
     if (lineHeight) {
         editor.style.lineHeight = lineHeight.value;
     }
+    
+    if (syncGridCheckbox && syncGridCheckbox.checked) {
+        const fs = parseInt(fontSize.value) || 16;
+        const lh = parseFloat(lineHeight ? lineHeight.value : 1) || 1;
+        
+        if (gridXInput) gridXInput.value = Math.round(fs / 2);
+        if (gridYInput) gridYInput.value = Math.round(fs * lh);
+        updateGrid();
+    }
 }
 
 function toggleTheme() {
@@ -422,6 +439,20 @@ function toggleGrid() {
     }
     
     saveToLocalStorage();
+}
+
+function toggleSyncGrid(save = true) {
+    if (!syncGridCheckbox) return;
+    const isSync = syncGridCheckbox.checked;
+    
+    if (gridXInput) gridXInput.disabled = isSync;
+    if (gridYInput) gridYInput.disabled = isSync;
+    
+    if (isSync) {
+        updateFont(); // This will trigger grid update
+    }
+    
+    if (save) saveToLocalStorage();
 }
 
 function updateMaxLen() {
@@ -761,7 +792,8 @@ function saveToLocalStorage() {
             symbolManager ? symbolManager.getFavorites() : null,
             gridLayer ? !gridLayer.classList.contains('hidden') : true,
             gridXInput ? parseInt(gridXInput.value) : 20,
-            gridYInput ? parseInt(gridYInput.value) : 20
+            gridYInput ? parseInt(gridYInput.value) : 20,
+            syncGridCheckbox ? syncGridCheckbox.checked : false
         );
         localStorage.setItem('utf8JisArtProject', project.toJson());
         return true;
