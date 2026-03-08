@@ -896,6 +896,7 @@ async function loadFile(event) {
     } else {
         editor.value = text;
     }
+    updateByteCount();
     // Clear input so same file can be loaded again
     event.target.value = '';
 }
@@ -958,6 +959,7 @@ function applyJsonFromTextarea() {
         // Update font renderings and icons
         updateFont();
         updateThemeIcons();
+        updateByteCount();
         closeJsonModal();
         
         // Save to local storage for persistence
