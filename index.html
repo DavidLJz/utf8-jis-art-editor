@@ -49,6 +49,7 @@
                 <button onclick="exportTxt()" class="w-full text-left px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200">Export .txt</button>
                 <button onclick="exportImage()" class="w-full text-left px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200">Export Image</button>
                 <button onclick="saveProject()" class="w-full text-left px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200">Save Project (.json)</button>
+                <button onclick="openJsonModal()" class="w-full text-left px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200" data-i18n="copyPasteJson">Copy/Paste JSON</button>
                 <hr class="border-neutral-200 dark:border-neutral-700">
                 <label class="block w-full text-left px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer text-neutral-800 dark:text-neutral-200">
                     Load File
@@ -192,6 +193,30 @@
                 <div class="flex gap-3 pt-2">
                     <button onclick="clearBg()" class="flex-1 px-4 py-2 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Clear</button>
                     <button onclick="applyBgSettings()" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-blue-500/30">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSON Modal -->
+    <div id="jsonModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 hidden backdrop-blur-sm">
+        <div class="bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl p-6 w-full max-w-2xl border border-neutral-200 dark:border-neutral-700">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-neutral-800 dark:text-neutral-100" data-i18n="jsonModalTitle">Copy/Paste Project JSON</h3>
+                <button onclick="closeJsonModal()" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2" data-i18n="jsonModalDesc">View, copy, or paste your project data in JSON format.</p>
+                    <textarea id="jsonTextArea" class="w-full h-80 p-3 font-mono text-xs bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-neutral-800 dark:text-neutral-200 resize-none" placeholder="Paste JSON here..."></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button onclick="copyJsonToClipboard()" id="copyJsonBtn" class="flex-1 px-4 py-2 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors" data-i18n="copyToClipboard">Copy to Clipboard</button>
+                    <button onclick="applyJsonFromTextarea()" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-blue-500/30" data-i18n="applyJson">Apply JSON</button>
                 </div>
             </div>
         </div>

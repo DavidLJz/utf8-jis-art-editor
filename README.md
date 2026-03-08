@@ -1,5 +1,10 @@
 # ToDo
 - [x] Add ruler guide
+- [ ] Grid guide should be synced with the text size and line height settings
+- [ ] Move Save messages to the right of the screen
+- [ ] Add a Save Button
+- [ ] Add a "Help" section with instructions and keyboard shortcuts
+- [ ] Add a "Tips" section with tips for creating JIS art and using the editor
 - [x] Add hard limit for characters per line setting
 - [ ] Select cell and replace with any input character (currently only works with the last used character)
 - [x] Show a saving indicator when saving to local storage

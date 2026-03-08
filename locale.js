@@ -26,7 +26,12 @@ class LocaleHelper {
         errImgSize: "Image size must be less than 3MB.",
         gridToggle: "Toggle Grid Guide",
         gridX: "Grid X",
-        gridY: "Grid Y"
+        gridY: "Grid Y",
+        copyPasteJson: "Copy/Paste JSON",
+        jsonModalTitle: "Copy/Paste Project JSON",
+        jsonModalDesc: "View, copy, or paste your project data in JSON format.",
+        copyToClipboard: "Copy to Clipboard",
+        applyJson: "Apply JSON"
     };
 
     static ES = {
@@ -56,7 +61,12 @@ class LocaleHelper {
         errImgSize: "La imagen debe ser menor a 3MB.",
         gridToggle: "Alternar Guía de Cuadrícula",
         gridX: "Cuadrícula X",
-        gridY: "Cuadrícula Y"
+        gridY: "Cuadrícula Y",
+        copyPasteJson: "Copiar/Pegar JSON",
+        jsonModalTitle: "Copiar/Pegar JSON del Proyecto",
+        jsonModalDesc: "Ver, copiar o pegar los datos de tu proyecto en formato JSON.",
+        copyToClipboard: "Copiar al Portapapeles",
+        applyJson: "Aplicar JSON"
     };
 
     constructor() {

@@ -900,6 +900,76 @@ async function loadFile(event) {
     event.target.value = '';
 }
 
+function openJsonModal() {
+    const project = new Project();
+    document.getElementById('jsonTextArea').value = project.toJson();
+    document.getElementById('jsonModal').classList.remove('hidden');
+}
+
+function closeJsonModal() {
+    document.getElementById('jsonModal').classList.add('hidden');
+    const copyBtn = document.getElementById('copyJsonBtn');
+    if (copyBtn && typeof localeHelper !== 'undefined') {
+        copyBtn.textContent = localeHelper.msg('copyToClipboard');
+    }
+}
+
+async function copyJsonToClipboard() {
+    const textArea = document.getElementById('jsonTextArea');
+    const btn = document.getElementById('copyJsonBtn');
+    try {
+        await navigator.clipboard.writeText(textArea.value);
+        const originalText = btn.textContent;
+        btn.textContent = "Copied!";
+        setTimeout(() => {
+            btn.textContent = originalText;
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+        alert('Failed to copy to clipboard.');
+    }
+}
+
+function applyJsonFromTextarea() {
+    const text = document.getElementById('jsonTextArea').value;
+    try {
+        const data = JSON.parse(text);
+        const project = Project.fromObject(data);
+        
+        // Sync state to UI
+        if (project.content !== undefined) editor.value = project.content;
+        if (project.font) fontSelect.value = project.font;
+        if (project.size) fontSize.value = project.size;
+        
+        if (project.lineHeight && typeof lineHeight !== 'undefined' && lineHeight) {
+            lineHeight.value = project.lineHeight;
+        }
+        
+        if (project.bgSettings) {
+            applyBgSettingsFromData(project.bgSettings);
+        }
+        
+        if (project.theme === 'dark') {
+            document.body.classList.add('dark');
+        } else if (project.theme === 'light') {
+            document.body.classList.remove('dark');
+        }
+        
+        // Update font renderings and icons
+        updateFont();
+        updateThemeIcons();
+        closeJsonModal();
+        
+        // Save to local storage for persistence
+        if (typeof saveToLocalStorage === 'function') {
+            saveToLocalStorage();
+        }
+    } catch (e) {
+        console.error("JSON Error:", e);
+        alert("Error parsing JSON input. Please ensure it is a valid project JSON.");
+    }
+}
+
 // Shortcut: Tab key in textarea
 editor.addEventListener('keydown', (e) => {
     if (e.key === 'Tab') {
