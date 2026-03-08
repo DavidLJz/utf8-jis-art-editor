@@ -1,5 +1,57 @@
 // Make floating bar draggable
 
+const APP_FONTS = [
+    { id: 'ms-pgothic', name: 'MS PGothic', family: "'MS PGothic'", isSystem: true },
+    { id: 'monospace', name: 'Default Monospace', family: 'monospace', isSystem: true },
+    { id: 'courier-new', name: 'Courier New', family: "'Courier New', Courier, monospace", isSystem: true },
+    { id: 'lucida-console', name: 'Lucida Console', family: "'Lucida Console', Monaco, monospace", isSystem: true },
+    { id: 'consolas', name: 'Consolas', family: "'Consolas', 'Monaco', monospace", isSystem: true },
+    // Example of a custom font:
+    // { id: 'mona-subset', name: 'Mona Subset', family: 'MonaSubset', path: 'assets/fonts/mona-subset.woff2', format: 'woff2' }
+];
+
+function loadCustomFonts() {
+    const customFonts = APP_FONTS.filter(f => !f.isSystem && f.path);
+    if (customFonts.length === 0) return;
+
+    let css = '';
+    customFonts.forEach(font => {
+        css += `
+@font-face {
+    font-family: ${font.family};
+    src: url('${font.path}') format('${font.format || 'woff2'}');
+    font-display: swap;
+}`;
+    });
+
+    const style = document.createElement('style');
+    style.id = 'custom-fonts-style';
+    style.textContent = css;
+    document.head.appendChild(style);
+}
+
+function populateFontSelector() {
+    if (!fontSelect) return;
+    
+    // Remember current value
+    const currentValue = fontSelect.value;
+    
+    // Clear existing options
+    fontSelect.innerHTML = '';
+    
+    APP_FONTS.forEach(font => {
+        const option = document.createElement('option');
+        option.value = font.family;
+        option.textContent = font.name;
+        fontSelect.appendChild(option);
+    });
+    
+    // Restore value if it exists in new list, otherwise default to first
+    if (APP_FONTS.some(f => f.family === currentValue)) {
+        fontSelect.value = currentValue;
+    }
+}
+
 // Background Settings logic
 class BGSettings {
     constructor(image = null, opacity = 0.5, scale = 100, posX = 50, posY = 50) {
@@ -236,6 +288,9 @@ function renderSymbolGallery() {
 }
 
 function init() {
+    loadCustomFonts();
+    populateFontSelector();
+    
     localeHelper = new LocaleHelper();
     const locale = localeHelper;
 
