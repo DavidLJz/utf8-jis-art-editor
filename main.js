@@ -346,6 +346,10 @@ function init() {
 
     document.getElementById('footer-year').textContent = new Date().getFullYear();
 
+    const sample = "\u3000\u3000 \u2227\uff3f\u2227\u3000\u3000\u3000\uff0f\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3\uffe3 \n\u3000\u3000\uff08\u3000\u00b4\u2200\uff40\uff09\u3000\uff1c\u3000\"Depict your enemy as a soyjak.\" - Sun Tsu \n\u3000\u3000\uff08\u3000\u3000\u3000\u3000\uff09 \u3000\u3000\uff3c\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\uff3f\u3000 \n\u3000\u3000\uff5c \uff5c\u3000| \n\u3000\u3000\uff08_\uff3f\uff09\uff3f) ";
+
+    editor.setAttribute('placeholder', sample);
+
     // give the editor initial value from localStorage if present
     const saved = localStorage.getItem('utf8JisArtProject');
     if (saved) {
