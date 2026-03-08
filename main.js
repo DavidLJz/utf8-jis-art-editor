@@ -24,7 +24,7 @@ class BGSettings {
 
 // project data wrapper
 class Project {
-    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80, symbolData = null, gridEnabled = true, gridX = 20, gridY = 20, syncGrid = false) {
+    constructor(content = "", font = "", size = "", lineHeight = undefined, theme = "light", timestamp = "", bgSettings = null, guidePos = 400, maxLen = 80, symbolData = null, gridEnabled = true, gridX = 20, gridY = 20, syncGrid = false, readOnly = false) {
         this.content = content;
         this.font = font;
         this.size = size;
@@ -39,6 +39,7 @@ class Project {
         this.gridX = gridX;
         this.gridY = gridY;
         this.syncGrid = syncGrid;
+        this.readOnly = readOnly;
     }
 
     toJSON() {
@@ -57,7 +58,8 @@ class Project {
             gridEnabled: this.gridEnabled,
             gridX: this.gridX,
             gridY: this.gridY,
-            syncGrid: this.syncGrid
+            syncGrid: this.syncGrid,
+            readOnly: this.readOnly
         };
     }
 
@@ -77,7 +79,8 @@ class Project {
             obj.gridEnabled !== undefined ? obj.gridEnabled : true,
             obj.gridX !== undefined ? obj.gridX : 20,
             obj.gridY !== undefined ? obj.gridY : 20,
-            obj.syncGrid !== undefined ? obj.syncGrid : false
+            obj.syncGrid !== undefined ? obj.syncGrid : false,
+            obj.readOnly !== undefined ? obj.readOnly : false
         );
     }
 
@@ -286,6 +289,10 @@ function init() {
                 toggleSyncGrid(false); // Update input states without saving immediately
             }
 
+            if (project.readOnly) {
+                setReadOnly(true);
+            }
+
             currentSymbolData = project.symbolData;
         } catch (e) {
             console.warn('failed to parse autosaved project', e);
@@ -351,6 +358,7 @@ function showLimitFeedback() {
 }
 
 function insertAtCursor(text) {
+    if (editor.readOnly) return;
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
     const max = maxLenInput ? parseInt(maxLenInput.value) : 0;
@@ -403,6 +411,60 @@ function updateFont() {
 function toggleTheme() {
     document.body.classList.toggle('dark');
     updateThemeIcons();
+    saveToLocalStorage();
+}
+
+function toggleReadOnly() {
+    const isReadOnly = !editor.readOnly;
+    setReadOnly(isReadOnly);
+    saveToLocalStorage();
+}
+
+function setReadOnly(isReadOnly) {
+    editor.readOnly = isReadOnly;
+    
+    // Toggle UI icons
+    const unlockIcon = document.getElementById('unlock-icon');
+    const lockIcon = document.getElementById('lock-icon');
+    const toggleBtn = document.getElementById('readOnlyToggle');
+    
+    if (isReadOnly) {
+        unlockIcon?.classList.add('hidden');
+        lockIcon?.classList.remove('hidden');
+        toggleBtn?.classList.add('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400');
+        editor.classList.add('editor-locked');
+    } else {
+        unlockIcon?.classList.remove('hidden');
+        lockIcon?.classList.add('hidden');
+        toggleBtn?.classList.remove('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400');
+        editor.classList.remove('editor-locked');
+    }
+    
+    // Disable/Enable other formatting controls
+    const controls = [
+        fontSelect, 
+        fontSize, 
+        lineHeight, 
+        guidePosInput, 
+        maxLenInput, 
+        syncGridCheckbox,
+        gridXInput,
+        gridYInput
+    ];
+    
+    controls.forEach(control => {
+        if (control) {
+            control.disabled = isReadOnly;
+            // Special case for grid inputs which might be already disabled by sync
+            if (!isReadOnly && syncGridCheckbox?.checked && (control === gridXInput || control === gridYInput)) {
+                control.disabled = true;
+            }
+        }
+    });
+
+    // Disable background image button if needed? 
+    // Maybe keep it enabled so they can still see/adjust the reference even if they can't edit.
+    // But for "Read Only" usually we want to lock the whole project state.
 }
 
 function updateGuide() {
@@ -793,7 +855,8 @@ function saveToLocalStorage() {
             gridLayer ? !gridLayer.classList.contains('hidden') : true,
             gridXInput ? parseInt(gridXInput.value) : 20,
             gridYInput ? parseInt(gridYInput.value) : 20,
-            syncGridCheckbox ? syncGridCheckbox.checked : false
+            syncGridCheckbox ? syncGridCheckbox.checked : false,
+            editor.readOnly
         );
         localStorage.setItem('utf8JisArtProject', project.toJson());
         return true;

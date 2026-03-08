@@ -1,14 +1,13 @@
 # ToDo
 - [x] Add ruler guide
 - [x] Grid guide should be synced with the text size and line height settings
-- [ ] Move Save messages to the right of the screen
 - [x] Add a Save Button
 - [ ] Add a "Help" section with instructions and keyboard shortcuts
 - [ ] Add a "Tips" section with tips for creating JIS art and using the editor
 - [x] Add hard limit for characters per line setting
 - [x] Show a saving indicator when saving to local storage
 - [x] Autosave contents and config to local storage
-- [ ] Read only mode
+- [x] Read only mode
 - [x] Fix theme toggle not working on the text input
 - [x] Allow Resizing the text input
 - [x] Fix textarea width

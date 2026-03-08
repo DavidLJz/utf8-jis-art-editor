@@ -68,6 +68,15 @@
     backdrop-filter: blur(8px);
 }
 
+.editor-locked {
+    cursor: default !important;
+    background-color: rgba(240, 240, 240, 0.3) !important;
+}
+
+.dark .editor-locked {
+    background-color: rgba(30, 30, 30, 0.3) !important;
+}
+
 #bgModal[style*="display: none"] {
     display: none !important;
 }

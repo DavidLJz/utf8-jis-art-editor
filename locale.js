@@ -34,7 +34,10 @@ class LocaleHelper {
         copyToClipboard: "Copy to Clipboard",
         applyJson: "Apply JSON",
         save: "Save",
-        saved: "Saved!"
+        saved: "Saved!",
+        readOnly: "Read Only Mode",
+        locked: "Locked",
+        unlocked: "Unlocked"
     };
 
     static ES = {
@@ -72,7 +75,10 @@ class LocaleHelper {
         copyToClipboard: "Copiar al Portapapeles",
         applyJson: "Aplicar JSON",
         save: "Guardar",
-        saved: "¡Guardado!"
+        saved: "¡Guardado!",
+        readOnly: "Modo Solo Lectura",
+        locked: "Bloqueado",
+        unlocked: "Desbloqueado"
     };
 
     constructor() {
