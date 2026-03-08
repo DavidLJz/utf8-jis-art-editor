@@ -541,10 +541,13 @@ function updateByteCount() {
     if (!byteCounter || !editor) return;
     const text = editor.value;
     const bytes = new TextEncoder().encode(text).length;
+    const chars = text.length;
     
     // Use localized string with fallback
     const format = localeHelper.msg('byteCount');
-    byteCounter.textContent = format.replace('{count}', bytes);
+    const byteDisplay = format.replace('{count}', bytes);
+    
+    byteCounter.innerHTML = `${byteDisplay} &mdash; ${chars} chars`;
 }
 
 const displayFailedAutoSave = () => {
