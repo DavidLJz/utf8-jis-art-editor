@@ -58,6 +58,15 @@
             </div>
         </div>
 
+        <!-- Quick Save (Icon Only) -->
+        <button onclick="manualSave()" class="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-all active:scale-95 group relative" title="Save Snapshot">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 4H16L20 8V20C20 20.55 19.55 21 19 21H5C4.45 21 4 20.55 4 20V5C4 4.45 4.45 4 5 4H8Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 4V8H9V4" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21V13H17V21" />
+            </svg>
+        </button>
+
         <!-- Font Selector -->
         <select id="fontSelect" onchange="updateFont()" class="bg-white dark:bg-neutral-700 border-none text-sm px-2 py-1.5 focus:ring-0 cursor-pointer text-neutral-800 dark:text-neutral-200">
             <option value="'MS PGothic'">MS PGothic</option>

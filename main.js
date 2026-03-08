@@ -537,6 +537,26 @@ const toggleSavingIndicator = (show) => {
     }
 };
 
+function manualSave() {
+    // Immediate save to localStorage
+    toggleSavingIndicator(true);
+    const success = saveToLocalStorage();
+    
+    if (success) {
+        const textEl = indicator.querySelector('.text-sm');
+        const originalText = textEl.textContent;
+        textEl.textContent = localeHelper.msg('saved');
+        setTimeout(() => {
+            toggleSavingIndicator(false);
+            setTimeout(() => {
+                textEl.textContent = originalText;
+            }, 500);
+        }, 1500);
+    } else {
+        setTimeout(() => toggleSavingIndicator(false), 2000);
+    }
+}
+
 function updateByteCount() {
     if (!byteCounter || !editor) return;
     const text = editor.value;

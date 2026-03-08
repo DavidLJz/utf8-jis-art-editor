@@ -31,7 +31,9 @@ class LocaleHelper {
         jsonModalTitle: "Copy/Paste Project JSON",
         jsonModalDesc: "View, copy, or paste your project data in JSON format.",
         copyToClipboard: "Copy to Clipboard",
-        applyJson: "Apply JSON"
+        applyJson: "Apply JSON",
+        save: "Save",
+        saved: "Saved!"
     };
 
     static ES = {
@@ -66,7 +68,9 @@ class LocaleHelper {
         jsonModalTitle: "Copiar/Pegar JSON del Proyecto",
         jsonModalDesc: "Ver, copiar o pegar los datos de tu proyecto en formato JSON.",
         copyToClipboard: "Copiar al Portapapeles",
-        applyJson: "Aplicar JSON"
+        applyJson: "Aplicar JSON",
+        save: "Guardar",
+        saved: "¡Guardado!"
     };
 
     constructor() {
