@@ -94,6 +94,12 @@
             <input type="number" id="lineHeight" value="1" min="0.5" max="3" step="0.05" onchange="updateFont()" class="w-10 bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 text-neutral-800 dark:text-neutral-200 text-center [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" title="Line Height" style="-moz-appearance: textfield; appearance: textfield;">
         </div>
 
+        <!-- Visual Zoom -->
+        <div class="flex items-center space-x-1">
+            <label for="zoomPercent" class="text-xs font-bold text-neutral-800 dark:text-neutral-200">Zoom</label>
+            <input type="number" id="zoomPercent" value="100" min="50" max="300" step="10" onchange="setEditorZoom()" class="w-12 bg-transparent border-none text-sm px-2 py-1.5 focus:ring-0 text-neutral-800 dark:text-neutral-200 text-center [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" title="Editor Zoom (%)" style="-moz-appearance: textfield; appearance: textfield;">
+        </div>
+
         <!-- Divider -->
         <div class="h-6 w-px bg-neutral-300 dark:bg-neutral-600 mx-1"></div>
 
@@ -248,17 +254,22 @@
         <!-- Visual Wrapper (Artificial Padding) -->
         <div id="editorVisualContainer" class="w-full max-w-[80vw] h-full max-h-[80vh] bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 p-6 overflow-hidden flex flex-col transition-colors duration-300">
             <div class="w-full h-full relative">
-                <!-- Visual Guide Rule -->
-                <div id="guideRule" class="absolute top-0 bottom-0 w-px bg-red-500/30 dark:bg-red-400/30 z-20 pointer-events-none transition-all hidden" style="left: 400px;"></div>
+                <div id="editorZoomSurface" class="absolute top-0 left-0">
+                    <!-- Visual Guide Rule -->
+                    <div id="guideRule" class="absolute top-0 bottom-0 w-px bg-red-500/30 dark:bg-red-400/30 z-20 pointer-events-none transition-all hidden" style="left: 400px;"></div>
 
-                <!-- Background Layer -->
-                <div id="editorBgLayer" class="absolute inset-0 z-0 pointer-events-none bg-no-repeat rounded-lg opacity-0" style="padding: 0; background-origin: padding-box;"></div>
-                
-                <!-- Grid Layer -->
-                <div id="gridLayer" class="absolute inset-0 z-[1] pointer-events-none rounded-lg hidden"></div>
+                    <!-- Background Layer -->
+                    <div id="editorBgLayer" class="absolute inset-0 z-0 pointer-events-none bg-no-repeat rounded-lg opacity-0" style="padding: 0; background-origin: padding-box;"></div>
+                    
+                    <!-- Grid Layer -->
+                    <div id="gridLayer" class="absolute inset-0 z-[1] pointer-events-none rounded-lg hidden"></div>
 
-                <textarea id="editor" spellcheck="false" placeholder="Start here..." 
-                    class="w-full h-full p-0 bg-transparent text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-0 transition-all resize-none relative z-10"></textarea>
+                    <!-- Zoom raster text layer (used only when zoom != 100%) -->
+                    <canvas id="editorTextRaster" class="absolute inset-0 z-[5] pointer-events-none hidden"></canvas>
+
+                    <textarea id="editor" spellcheck="false" placeholder="Start here..." 
+                        class="w-full h-full p-0 bg-transparent text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-0 transition-all resize-none relative z-10"></textarea>
+                </div>
             </div>
         </div>
     </main>

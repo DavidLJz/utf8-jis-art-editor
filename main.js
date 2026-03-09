@@ -192,6 +192,9 @@ const palette = document.getElementById('symbolPalette');
 const paletteButtons = document.getElementById('palette-buttons');
 const lineHeight = document.getElementById('lineHeight');
 const byteCounter = document.getElementById('byteCounter');
+const zoomInput = document.getElementById('zoomPercent');
+const zoomSurface = document.getElementById('editorZoomSurface');
+const editorTextRaster = document.getElementById('editorTextRaster');
 
 // Background parameters
 const bgModal = document.getElementById('bgModal');
@@ -269,6 +272,8 @@ class SymbolManager {
 
 let symbolManager;
 let currentSymbolData = null;
+let editorZoom = 1;
+let textRasterRaf = null;
 
 const TOP_QUICK_SYMBOLS = ['█', '▓', '▒', '░', '─', '│'];
 
@@ -410,6 +415,7 @@ function init() {
     updateByteCount();
     updateGuide();
     updateGrid();
+    resetEditorZoom();
     makeFloatingBarDraggable();
 
     renderSymbolBar();
@@ -421,16 +427,22 @@ function init() {
                 syncBgLayerSync();
             }
             syncGridLayer();
+            requestTextRasterSync();
         });
         ro.observe(editor);
     }
+
+    window.addEventListener('resize', () => {
+        requestTextRasterSync();
+    });
 }
 
 function syncGridLayer() {
     if (!gridLayer || !editor) return;
-    const rect = editor.getBoundingClientRect();
-    gridLayer.style.width = rect.width + 'px';
-    gridLayer.style.height = rect.height + 'px';
+    const width = editor.clientWidth || editor.offsetWidth;
+    const height = editor.clientHeight || editor.offsetHeight;
+    gridLayer.style.width = width + 'px';
+    gridLayer.style.height = height + 'px';
 }
 
 function syncBgLayerSync() {
@@ -438,9 +450,10 @@ function syncBgLayerSync() {
     
     // Both are now contained in a relative parent with 100% size
     // We just ensure the bgLayer dimensions match the textarea's current bounding box
-    const rect = editor.getBoundingClientRect();
-    bgLayer.style.width = rect.width + 'px';
-    bgLayer.style.height = rect.height + 'px';
+    const width = editor.clientWidth || editor.offsetWidth;
+    const height = editor.clientHeight || editor.offsetHeight;
+    bgLayer.style.width = width + 'px';
+    bgLayer.style.height = height + 'px';
 }
 
 function showLimitFeedback() {
@@ -490,6 +503,7 @@ function insertAtCursor(text) {
     editor.selectionStart = editor.selectionEnd = start + text.length;
     updateByteCount();
     saveToLocalStorage();
+    requestTextRasterSync();
 }
 
 function updateFont() {
@@ -507,6 +521,8 @@ function updateFont() {
         if (gridYInput) gridYInput.value = Math.round(fs * lh);
         updateGrid();
     }
+
+    requestTextRasterSync();
 }
 
 function toggleTheme() {
@@ -588,6 +604,136 @@ function updateGrid() {
     
     gridLayer.style.backgroundSize = `${x}px ${y}px`;
     saveToLocalStorage();
+}
+
+function clampZoomPercent(value) {
+    if (!Number.isFinite(value)) return 100;
+    return Math.min(300, Math.max(50, value));
+}
+
+function isRasterZoomModeEnabled() {
+    return Math.abs(editorZoom - 1) > 0.001;
+}
+
+function clearTextRasterLayer() {
+    if (!editorTextRaster) return;
+    const ctx = editorTextRaster.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, editorTextRaster.width, editorTextRaster.height);
+}
+
+function setZoomRasterMode(enabled) {
+    if (!editor || !editorTextRaster) return;
+
+    if (!enabled) {
+        editor.classList.remove('zoom-raster-input');
+        editorTextRaster.classList.add('hidden');
+        if (textRasterRaf) {
+            cancelAnimationFrame(textRasterRaf);
+            textRasterRaf = null;
+        }
+        clearTextRasterLayer();
+        return;
+    }
+
+    const caretColor = document.body.classList.contains('dark') ? '#f5f5f5' : '#1f2937';
+    editor.style.setProperty('--zoom-caret-color', caretColor);
+    editor.classList.add('zoom-raster-input');
+    editorTextRaster.classList.remove('hidden');
+    requestTextRasterSync();
+}
+
+function syncTextRasterLayer() {
+    if (!editor || !editorTextRaster || !isRasterZoomModeEnabled()) return;
+
+    const width = editor.clientWidth || editor.offsetWidth;
+    const height = editor.clientHeight || editor.offsetHeight;
+    if (width <= 0 || height <= 0) return;
+
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const rasterWidth = Math.ceil(width * dpr);
+    const rasterHeight = Math.ceil(height * dpr);
+
+    if (editorTextRaster.width !== rasterWidth || editorTextRaster.height !== rasterHeight) {
+        editorTextRaster.width = rasterWidth;
+        editorTextRaster.height = rasterHeight;
+    }
+
+    editorTextRaster.style.width = width + 'px';
+    editorTextRaster.style.height = height + 'px';
+
+    const ctx = editorTextRaster.getContext('2d');
+    if (!ctx) return;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+
+    const computed = getComputedStyle(editor);
+    const fontSizePx = parseFloat(computed.fontSize) || 16;
+    const lineHeightPxFromCss = parseFloat(computed.lineHeight);
+    const lineHeightMultiplier = lineHeight ? (parseFloat(lineHeight.value) || 1) : 1;
+    const lineHeightPxRaw = Number.isFinite(lineHeightPxFromCss) ? lineHeightPxFromCss : (fontSizePx * lineHeightMultiplier);
+    const lineHeightPx = lineHeightPxRaw > 0 ? lineHeightPxRaw : fontSizePx;
+
+    const fontStyle = computed.fontStyle || 'normal';
+    const fontWeight = computed.fontWeight || '400';
+    const fontFamily = computed.fontFamily || fontSelect.value;
+
+    ctx.font = `${fontStyle} ${fontWeight} ${fontSizePx}px ${fontFamily}`;
+    ctx.fillStyle = document.body.classList.contains('dark') ? '#f5f5f5' : '#1f2937';
+    ctx.textBaseline = 'top';
+
+    const lines = (editor.value || '').split('\n');
+    const scrollTop = editor.scrollTop || 0;
+    const scrollLeft = editor.scrollLeft || 0;
+
+    const firstVisibleLine = Math.max(0, Math.floor(scrollTop / lineHeightPx) - 1);
+    const lastVisibleLine = Math.min(lines.length - 1, Math.ceil((scrollTop + height) / lineHeightPx) + 1);
+
+    for (let i = firstVisibleLine; i <= lastVisibleLine; i++) {
+        const y = i * lineHeightPx - scrollTop;
+        ctx.fillText(lines[i] || '', -scrollLeft, y);
+    }
+}
+
+function requestTextRasterSync() {
+    if (!editorTextRaster || !isRasterZoomModeEnabled()) return;
+    if (textRasterRaf) return;
+
+    textRasterRaf = requestAnimationFrame(() => {
+        textRasterRaf = null;
+        syncTextRasterLayer();
+    });
+}
+
+function applyEditorZoom() {
+    if (!zoomSurface) return;
+    const inversePercent = 100 / editorZoom;
+    zoomSurface.style.width = `${inversePercent}%`;
+    zoomSurface.style.height = `${inversePercent}%`;
+    zoomSurface.style.transformOrigin = 'top left';
+    zoomSurface.style.transform = `scale(${editorZoom})`;
+
+    // Keep layers aligned after transform changes.
+    syncBgLayerSync();
+    syncGridLayer();
+    setZoomRasterMode(isRasterZoomModeEnabled());
+    requestTextRasterSync();
+}
+
+function setEditorZoom(value = null) {
+    if (!zoomInput) return;
+    const parsed = parseInt(value !== null ? value : zoomInput.value, 10);
+    const percent = clampZoomPercent(parsed);
+    zoomInput.value = percent;
+    editorZoom = percent / 100;
+    applyEditorZoom();
+}
+
+function resetEditorZoom() {
+    if (!zoomInput) return;
+    zoomInput.value = 100;
+    setEditorZoom(100);
 }
 
 function toggleGrid() {
@@ -696,6 +842,7 @@ function updateThemeIcons() {
     if (editor) {
         editor.style.backgroundColor = 'transparent';
         editor.style.color = isDark ? '#f5f5f5' : '#1f2937';
+        editor.style.setProperty('--zoom-caret-color', isDark ? '#f5f5f5' : '#1f2937');
 
         // Apply an overlay transparency to the TEXTAREA itself to act as 
         // the "contrast blocker" for the background image underneath.
@@ -709,6 +856,8 @@ function updateThemeIcons() {
             editor.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${bgAlpha})`;
         }
     }
+
+    requestTextRasterSync();
 }
 
 // File Management
@@ -984,6 +1133,11 @@ if (editor) {
     editor.addEventListener('input', () => {
         scheduleAutoSave();
         updateByteCount();
+        requestTextRasterSync();
+    });
+
+    editor.addEventListener('scroll', () => {
+        requestTextRasterSync();
     });
 }
 if (fontSelect) {
@@ -1040,6 +1194,21 @@ function downloadFile(content, fileName, contentType) {
 
 // create a PNG snapshot of the textarea content using current font settings
 function exportImage() {
+    const promptText = localeHelper
+        ? localeHelper.msg('exportScalePrompt')
+        : 'Export scale multiplier (1, 2, or 4):';
+    const invalidText = localeHelper
+        ? localeHelper.msg('exportScaleInvalid')
+        : 'Invalid scale. Please enter 1, 2, or 4.';
+    const rawScale = window.prompt(promptText, '2');
+    if (rawScale === null) return;
+
+    const scale = Number((rawScale || '').trim());
+    if (!Number.isInteger(scale) || ![1, 2, 4].includes(scale)) {
+        alert(invalidText);
+        return;
+    }
+
     const text = editor.value || "";
     const lines = text.split("\n");
     const size = parseInt(fontSize.value, 10) || 16;
@@ -1059,29 +1228,49 @@ function exportImage() {
 
     const lineHeightPx = size * lh;
     const padding = 10;
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.ceil(maxWidth) + padding * 2;
-    canvas.height = Math.ceil(lineHeightPx * lines.length) + padding * 2;
-    const ctx = canvas.getContext('2d');
+    const baseWidth = Math.max(1, Math.ceil(maxWidth) + padding * 2);
+    const baseHeight = Math.max(1, Math.ceil(lineHeightPx * lines.length) + padding * 2);
+
+    // Render text once at the real editor font metrics, then scale the bitmap.
+    // This avoids font hinting changes that can happen when text is drawn at larger effective sizes.
+    const baseCanvas = document.createElement('canvas');
+    baseCanvas.width = baseWidth;
+    baseCanvas.height = baseHeight;
+    const baseCtx = baseCanvas.getContext('2d');
+    if (!baseCtx) return;
 
     // background based on theme
     const bgColor = document.body.classList.contains('dark') ? '#000000' : '#ffffff';
     const fgColor = document.body.classList.contains('dark') ? '#f5f5f5' : '#000000';
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    baseCtx.fillStyle = bgColor;
+    baseCtx.fillRect(0, 0, baseWidth, baseHeight);
 
-    ctx.fillStyle = fgColor;
-    ctx.font = size + 'px ' + font;
-    ctx.textBaseline = 'top';
+    baseCtx.fillStyle = fgColor;
+    baseCtx.font = size + 'px ' + font;
+    baseCtx.textBaseline = 'top';
 
     lines.forEach((line, i) => {
-        ctx.fillText(line, padding, padding + i * lineHeightPx);
+        baseCtx.fillText(line, padding, padding + i * lineHeightPx);
     });
 
-    const dataUrl = canvas.toDataURL('image/png');
+    let exportCanvas = baseCanvas;
+    if (scale > 1) {
+        exportCanvas = document.createElement('canvas');
+        exportCanvas.width = baseWidth * scale;
+        exportCanvas.height = baseHeight * scale;
+
+        const exportCtx = exportCanvas.getContext('2d');
+        if (!exportCtx) return;
+
+        // Keep character shapes faithful to the base render during upscaling.
+        exportCtx.imageSmoothingEnabled = false;
+        exportCtx.drawImage(baseCanvas, 0, 0, exportCanvas.width, exportCanvas.height);
+    }
+
+    const dataUrl = exportCanvas.toDataURL('image/png');
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = 'artwork.png';
+    a.download = scale === 1 ? 'artwork.png' : `artwork@${scale}x.png`;
     a.click();
 }
 
@@ -1115,6 +1304,7 @@ async function loadFile(event) {
     } else {
         editor.value = text;
     }
+    resetEditorZoom();
     updateByteCount();
     // Clear input so same file can be loaded again
     event.target.value = '';
@@ -1179,6 +1369,7 @@ function applyJsonFromTextarea() {
         updateFont();
         updateThemeIcons();
         updateByteCount();
+        resetEditorZoom();
         closeJsonModal();
         
         // Save to local storage for persistence

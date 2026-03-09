@@ -39,7 +39,9 @@ class LocaleHelper {
         saved: "Saved!",
         readOnly: "Read Only Mode",
         locked: "Locked",
-        unlocked: "Unlocked"
+        unlocked: "Unlocked",
+        exportScalePrompt: "Export scale multiplier (1, 2, or 4):",
+        exportScaleInvalid: "Invalid scale. Please enter 1, 2, or 4."
     };
 
     static ES = {
@@ -82,7 +84,9 @@ class LocaleHelper {
         saved: "¡Guardado!",
         readOnly: "Modo Solo Lectura",
         locked: "Bloqueado",
-        unlocked: "Desbloqueado"
+        unlocked: "Desbloqueado",
+        exportScalePrompt: "Multiplicador de escala de exportacion (1, 2 o 4):",
+        exportScaleInvalid: "Escala invalida. Ingresa 1, 2 o 4."
     };
 
     constructor() {

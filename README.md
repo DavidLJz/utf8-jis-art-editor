@@ -2,7 +2,7 @@
 - [x] Add ruler guide
 - [x] Grid guide should be synced with the text size and line height settings
 - [x] Add a Save Button
-- [ ] Change render scale without altering font-size
+- [x] Change render scale without altering font-size
 - [ ] Customize character palette bar
 - [ ] Add a "Help" section with instructions and keyboard shortcuts
 - [ ] Add a "Tips" section with tips for creating JIS art and using the editor
@@ -24,3 +24,12 @@
 When the "Sync with Font" option is enabled, the grid adjusts automatically using the following formulas:
 - **Grid X (Horizontal):** `FontSize / 2` (approximate width for half-width characters).
 - **Grid Y (Vertical):** `FontSize * LineHeight` (matches the exact row height).
+
+### Export Scaling
+- Exporting as image now prompts for a raster scale multiplier (`1`, `2`, or `4`).
+- Higher multipliers increase PNG resolution without mutating editor font settings.
+- Export scaling preserves base glyph shape by upscaling a native-size text raster.
+
+### Visual Zoom
+- Editor zoom is visual-only and does not change the stored font-size value.
+- Zoom is intentionally temporary and resets to `100%` on reload/import.
